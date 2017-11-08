@@ -11,11 +11,15 @@
 .mtj.tmp/
 
 # Package Files #
-
+*.iml
 *.war
 *.ear
 *.tar.gz
 *.rar
+
+# Idea project files
+*/.idea/*
+
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
