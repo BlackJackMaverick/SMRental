@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="absmodjV3_20151116">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../jars/absmodjV3_20151116.zip!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/../jars/absmodjV3_20151116.zip!/doc" />
+    </JAVADOC>
+    <SOURCES />
+  </library>
+</component>

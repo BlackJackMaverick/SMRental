@@ -3,9 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/SMRental.iml" filepath="$PROJECT_DIR$/SMRental.iml" />
-      <module fileurl="file://$PROJECT_DIR$/Libraries/absmodjV3_20151116/absmodjV3_20151116.iml" filepath="$PROJECT_DIR$/Libraries/absmodjV3_20151116/absmodjV3_20151116.iml" />
-      <module fileurl="file://$PROJECT_DIR$/Libraries/colt/colt.iml" filepath="$PROJECT_DIR$/Libraries/colt/colt.iml" />
-      <module fileurl="file://$PROJECT_DIR$/Libraries/commons-lang3-3.4/commons-lang3-3.4.iml" filepath="$PROJECT_DIR$/Libraries/commons-lang3-3.4/commons-lang3-3.4.iml" />
     </modules>
   </component>
 </project>
