@@ -1,5 +1,6 @@
 package sm.rental.model;
 
+import java.util.*;
 import simulationModelling.AOSimulationModel;
 import simulationModelling.Behaviour;
 import simulationModelling.SequelActivity;
@@ -22,6 +23,12 @@ public class SMRental extends AOSimulationModel
 	/* Group and Queue entities */
 	// Define the reference variables to the various 
 	// entities with scope Set and Unary
+    protected RentalAgents rgRentalAgents=new RentalAgents(); //RG.RentalAgents
+	public Vans rgVans=new Vans(); //RG.Vans
+	protected ArrayList <Customer> Terminal1 = new ArrayList<Customer>();   // Q.Terminal 1
+	protected ArrayList<Customer> Terminal2 = new ArrayList<Customer>();   // Q.Terminal 2
+	protected ArrayList<Customer> ReturnLine = new ArrayList<Customer>();   // Q.RenturnLine
+	protected ArrayList<Customer> RentalLine = new ArrayList<Customer>();   // Q.RentalLine
 	// Objects can be created here or in the Initialise Action
 
 	/* Input Variables */
