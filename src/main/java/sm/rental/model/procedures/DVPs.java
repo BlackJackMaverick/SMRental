@@ -1,11 +1,13 @@
-package Model;
+package sm.rental.model.procedures;
 
-class DVPs 
+import sm.rental.model.SMRental;
+
+public class DVPs
 {
 	SMRental model;  // for accessing the clock
 	
 	// Constructor
-	protected DVPs(SMRental model) { this.model = model; }
+	public DVPs(SMRental model) { this.model = model; }
 
 	// Translate deterministic value procedures into methods
         /* -------------------------------------------------

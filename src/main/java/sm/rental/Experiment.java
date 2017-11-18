@@ -1,7 +1,8 @@
 // File: Experiment.java
 // Description:
+package sm.rental;
 
-import Model.*;
+import sm.rental.model.*;
 import cern.jet.random.engine.*;
 
 // Main Method: Experiments
@@ -26,7 +27,7 @@ class Experiment
        {
           mname = new SMRental(startTime,endTime,sds[i]);
           mname.runSimulation();
-          // See examples for hints on collecting output
+          // See examples for hints on collecting output1
           // and developping code for analysis
        }
    }

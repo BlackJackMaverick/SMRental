@@ -1,5 +1,8 @@
-package Model;
+package sm.rental.model;
 
+import lombok.Data;
+
+@Data
 class Constants 
 {
 	/* Constants */

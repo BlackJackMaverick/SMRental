@@ -1,11 +1,13 @@
-package Model;
+package sm.rental.model.procedures;
 
-class UDPs 
+import sm.rental.model.SMRental;
+
+public class UDPs
 {
 	SMRental model;  // for accessing the clock
 	
 	// Constructor
-	protected UDPs(SMRental model) { this.model = model; }
+	public UDPs(SMRental model) { this.model = model; }
 
 	// Translate User Defined Procedures into methods
     /*-------------------------------------------------
