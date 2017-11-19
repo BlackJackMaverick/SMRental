@@ -1,5 +1,5 @@
 # SMRental
-
+I added travis! [![Build Status](https://travis-ci.org/NuclearBanane/SMRental.svg?branch=master)](https://travis-ci.org/NuclearBanane/SMRental)
 ## Contributing to our Project
 
 * Get Intellij installed on your platform [here](https://www.jetbrains.com/)
