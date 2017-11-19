@@ -1,4 +1,4 @@
-package Model.Activities;
+package sm.rental.model.activities;
 
 public class Board {
 }

@@ -1,4 +1,4 @@
 package  sm.rental.model.entities;
 
-public class Van {
+public class RentalCounter {
 }
