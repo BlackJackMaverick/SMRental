@@ -1,8 +1,14 @@
-package Model;
+package sm.rental.model;
 
 import simulationModelling.AOSimulationModel;
 import simulationModelling.Behaviour;
 import simulationModelling.SequelActivity;
+import sm.rental.model.outputs.Output_1;
+import sm.rental.model.procedures.DVPs;
+import sm.rental.model.procedures.RVPs;
+import sm.rental.model.procedures.UDPs;
+import sm.rental.model.actions.Initialise;
+
 
 //
 // The Simulation model Class
@@ -13,7 +19,7 @@ public class SMRental extends AOSimulationModel
         // Define the parameters
 
 	/*-------------Entity Data Structures-------------------*/
-	/* Group and Queue Entities */
+	/* Group and Queue entities */
 	// Define the reference variables to the various 
 	// entities with scope Set and Unary
 	// Objects can be created here or in the Initialise Action
@@ -26,10 +32,10 @@ public class SMRental extends AOSimulationModel
 	protected DVPs dvp = new DVPs(this);  // Reference to dvp object
 	protected UDPs udp = new UDPs(this);
 
-	// Output object
-	protected Output output = new Output(this);
+	// Output_1 object
+	protected Output_1 output1 = new Output_1(this);
 	
-	// Output values - define the public methods that return values
+	// Output_1 values - define the public methods that return values
 	// required for experimentation.
 
 
@@ -59,9 +65,9 @@ public class SMRental extends AOSimulationModel
 	protected void testPreconditions(Behaviour behObj)
 	{
 		reschedule (behObj);
-		// Check preconditions of Conditional Activities
+		// Check preconditions of Conditional activities
 
-		// Check preconditions of Interruptions in Extended Activities
+		// Check preconditions of Interruptions in Extended activities
 	}
 	
 	public void eventOccured()
@@ -70,12 +76,12 @@ public class SMRental extends AOSimulationModel
 		// Can add other debug code to monitor the status of the system
 		// See examples for suggestions on setup logging
 
-		// Setup an updateTrjSequences() method in the Output class
+		// Setup an updateTrjSequences() method in the Output_1 class
 		// and call here if you have Trajectory Sets
 		// updateTrjSequences() 
 	}
 
-	// Standard Procedure to start Sequel Activities with no parameters
+	// Standard Procedure to start Sequel activities with no parameters
 	protected void spStart(SequelActivity seqAct)
 	{
 		seqAct.startingEvent();

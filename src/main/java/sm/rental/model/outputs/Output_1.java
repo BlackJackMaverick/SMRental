@@ -1,10 +1,12 @@
-package Model;
+package sm.rental.model.outputs;
 
-class Output 
+import sm.rental.model.SMRental;
+
+public class Output_1
 {
 	SMRental model;
 	
-	protected Output(SMRental md) { model = md; }
+	public Output_1(SMRental md) { model = md; }
     // Use OutputSequence class to define Trajectory and Sample Sequences
     // Trajectory Sequences
 

@@ -1,9 +1,11 @@
-package Model;
+package sm.rental.model.procedures;
 
 import cern.jet.random.Exponential;
 import cern.jet.random.engine.MersenneTwister;
+import sm.rental.model.SMRental;
+import sm.rental.model.Seeds;
 
-class RVPs 
+public class RVPs
 {
 	SMRental model; // for accessing the clock
     // Data Models - i.e. random veriate generators for distributions
@@ -13,7 +15,7 @@ class RVPs
 
 
 	// Constructor
-	protected RVPs(SMRental model, Seeds sd)
+	public RVPs(SMRental model, Seeds sd)
 	{ 
 		this.model = model; 
 		// Set up distribution functions
