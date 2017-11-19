@@ -2,7 +2,7 @@ package sm.rental.model.entities;
 
 
 import java.util.HashSet;
-class Vans {
+public class Vans {
     public static enum VansStatus {BOARDING_T1, BOARDING_T2, BOARDING_RC, EXITING_DP, EXITING_RC, TRAVELLING_TO_T1_FROM_DP,
         TRAVELLING_TO_T1_FROM_RC, TRAVELLING_TO_T2, TRAVELLING_TO_RC, TRAVELLING_TO_DP, LOADING_T1, LOADING_T2, LOADING_RC,
         UNLOADING_RC, UNLOADING_DP};
