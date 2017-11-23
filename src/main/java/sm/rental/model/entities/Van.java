@@ -25,6 +25,8 @@ public class Van {
     public HashSet<Customer> group = new HashSet<Customer>(); //List of customers currently in each van
     public int capacity;//Number of seats left available.
     public double mileage;//Total number of miles driven by the van in the observation interval
+    public int n=getN();
+    public int vanCapacity=12; // OR 18,30
 
 
 
@@ -41,6 +43,7 @@ public class Van {
     public int getN() {
         return group.size();
     }// Attribute n
+
 
     public Van(VansStatus sta, int cap, double mil){
          status = sta;
