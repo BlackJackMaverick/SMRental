@@ -27,8 +27,9 @@ public class SMRental extends AOSimulationModel
 	// Define the reference variables to the various 
 	// entities with scope Set and Unary
 
-	public Van rgVan = new Van();
+	public Van [] rgVan = new Van[id]; // Don't know how to describe id.
 	public RentalCounter rgRentalCounter = new RentalCounter();
+
 	public ArrayList<Customer> Terminal1 = new ArrayList<Customer>();
 	public ArrayList<Customer> Terminal2 = new ArrayList<Customer>();
 	public ArrayList<Customer> ReturnLine = new ArrayList<Customer>();
