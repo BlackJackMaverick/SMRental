@@ -1,6 +1,8 @@
 package sm.rental.model;
 
 import java.util.*;
+
+import cern.colt.list.BooleanArrayList;
 import simulationModelling.AOSimulationModel;
 import simulationModelling.Behaviour;
 import simulationModelling.SequelActivity;
@@ -27,13 +29,13 @@ public class SMRental extends AOSimulationModel
 	// Define the reference variables to the various 
 	// entities with scope Set and Unary
 
-	public Van [] rgVan = new Van[id]; // Don't know how to describe id.
-	public RentalCounter rgRentalCounter = new RentalCounter();
+	private Van rgVans;
+	private RentalCounter rgRentalCounter;
 
-	public ArrayList<Customer> Terminal1 = new ArrayList<Customer>();
-	public ArrayList<Customer> Terminal2 = new ArrayList<Customer>();
-	public ArrayList<Customer> ReturnLine = new ArrayList<Customer>();
-	public ArrayList<Customer> RentalLine = new ArrayList<Customer>();
+	private ArrayList<Customer> Terminal1 = new ArrayList<Customer>();
+	private ArrayList<Customer> Terminal2 = new ArrayList<Customer>();
+	private ArrayList<Customer> ReturnLine = new ArrayList<Customer>();
+	private ArrayList<Customer> RentalLine = new ArrayList<Customer>();
 	// Objects can be created here or in the Initialise Action
 
 	/* Input Variables */
