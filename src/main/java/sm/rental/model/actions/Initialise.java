@@ -4,6 +4,7 @@ import simulationModelling.*;
 import simulationModelling.ScheduledAction;
 import sm.rental.model.SMRental;
 import sm.rental.model.entities.Van;
+import java.util.ArrayList;
 
 public class Initialise extends ScheduledAction
 {
@@ -16,7 +17,6 @@ public class Initialise extends ScheduledAction
 	int tsix = 0;  // set index to first entry.
 	protected double timeSequence() 
 	{
-
 		return ts[tsix++];  // only invoked at t=0
 	}
 
@@ -27,15 +27,16 @@ public class Initialise extends ScheduledAction
 		model.Terminal1.clear();
 		model.Terminal2.clear();
 
-		int id;
-		for(id=1; id<=  ;id++) {
-			// Don't know the value of id.
-			model.rgVan[id].status= model.rgVan[id].status.LOADING_T1;
-			model.rgVan[id].capacity=model.rgVan[id].vanCapacity;
-			model.rgVan[id].n=0 ;
-			model.rgVan[id].mileage=0;
+		Arraylist<Van> vans = model.rgVans.getVans();
+		int numVans = model.rgVans.getNumVans();
+		vans.clear();
+		for(int i=0; i<numVans; i++){
+			model.rgVans[i].status= model.rgVans[i].status.LOADING_T1;
+			model.rgVans.Van(12);
+			model.rgVans[i].n=0 ;
+			model.rgVans[i].mileage=0;
 		}
-
+		}
 		// System Initialisation
 		// Add initilisation instructions
 	}
