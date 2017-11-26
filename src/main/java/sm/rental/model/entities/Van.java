@@ -1,6 +1,8 @@
 package  sm.rental.model.entities;
 
-import java.util.HashSet;
+import lombok.Getter;
+
+import java.util.ArrayList;
 
 public class Van {
     private static enum VansStatus {
@@ -20,40 +22,30 @@ public class Van {
                         UNLOADING_RC,
                         UNLOADING_DP
     };
-    private VansStatus status;
-    public HashSet<Customer> group = new HashSet<Customer>(); //List of customers currently in each van
-    private int capacity;//Number of seats left available.
-    private double mileage;//Total number of miles driven by the van in the observation interval
-    private int numVans; //Total number of vans running in the system.
+    @Getter private VansStatus status;
+    private ArrayList<Customer> group;
+    @Getter private int capacity; //Number of seats left available.
+    @Getter private double mileage; //Total number of miles driven by the van in the observation interval
 
-    public int getNumVans(){
-        return this.numVans;
-    }
-    public VansStatus getVansStatus(){
-        return this.status;
-    }
-    public void setVansStatus(VansStatus status){
-        this.status=status;
-    }
-    public Van getVans(){
-        return Van.this;
-    }
     // Required methods to manipulate the group
     public void insertGrp(Customer icgCustomer) {
         group.add(icgCustomer);
-        capacity -= icgCustomer.getPassengers();
+        capacity -= icgCustomer.getNumPassengers();
     }
     public boolean removeGrp(Customer icgCustomer) {
-        capacity += icgCustomer.getPassengers();
+        capacity += icgCustomer.getNumPassengers();
         return group.remove(icgCustomer);
     }
     public int getN() {
         return group.size();
-    }// Attribute n
+    }
 
     public Van(int capacity){
          this.capacity = capacity;
-
+         this.group = new ArrayList<>();
+         this.status = VansStatus.LOADING_T1;
     }
-
+    public void addMileage(double milesTravelled){
+        this.mileage += milesTravelled;
+    }
 }

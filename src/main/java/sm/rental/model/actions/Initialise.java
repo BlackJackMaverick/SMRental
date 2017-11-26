@@ -22,24 +22,15 @@ public class Initialise extends ScheduledAction
 
 	protected void actionEvent() 
 	{
-		model.RentalLine.clear();
-		model.ReturnLine.clear();
-		model.Terminal1.clear();
-		model.Terminal2.clear();
+		model.getRentalLine().clear();
+		model.getReturnLine().clear();
+		model.getTerminal1().clear();
+		model.getTerminal2().clear();
 
-		Arraylist<Van> vans = model.rgVans.getVans();
-		int numVans = model.rgVans.getNumVans();
+		ArrayList<Van> vans = model.getRgVans();
+		int numVans = model.getNumVans();
+		int vanCapacity = model.getVanCapacity();
 		vans.clear();
-		for(int i=0; i<numVans; i++){
-			model.rgVans[i].status= model.rgVans[i].status.LOADING_T1;
-			model.rgVans.Van(12);
-			model.rgVans[i].n=0 ;
-			model.rgVans[i].mileage=0;
-		}
-		}
-		// System Initialisation
-		// Add initilisation instructions
+		for(int i=0; i<numVans; i++) vans.add(new Van(vanCapacity));
 	}
-	
-
 }

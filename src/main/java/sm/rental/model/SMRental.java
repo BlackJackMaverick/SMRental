@@ -2,7 +2,7 @@ package sm.rental.model;
 
 import java.util.*;
 
-import cern.colt.list.BooleanArrayList;
+import lombok.Getter;
 import simulationModelling.AOSimulationModel;
 import simulationModelling.Behaviour;
 import simulationModelling.SequelActivity;
@@ -22,20 +22,22 @@ public class SMRental extends AOSimulationModel
 {
 	// Constants available from Constants class
 	/* Parameter */
-        // Define the parameters
+	@Getter int vanCapacity;
+	@Getter int numVans;
+	@Getter int numRentalAgents;
 
 	/*-------------Entity Data Structures-------------------*/
 	/* Group and Queue entities */
 	// Define the reference variables to the various 
 	// entities with scope Set and Unary
 
-	private Van rgVans;
-	private RentalCounter rgRentalCounter;
+	@Getter private ArrayList<Van> rgVans;
+	@Getter private RentalCounter rgRentalCounter;
 
-	private ArrayList<Customer> Terminal1 = new ArrayList<Customer>();
-	private ArrayList<Customer> Terminal2 = new ArrayList<Customer>();
-	private ArrayList<Customer> ReturnLine = new ArrayList<Customer>();
-	private ArrayList<Customer> RentalLine = new ArrayList<Customer>();
+	@Getter private ArrayList<Customer> Terminal1 = new ArrayList<Customer>();
+	@Getter private ArrayList<Customer> Terminal2 = new ArrayList<Customer>();
+	@Getter private ArrayList<Customer> ReturnLine = new ArrayList<Customer>();
+	@Getter private ArrayList<Customer> RentalLine = new ArrayList<Customer>();
 	// Objects can be created here or in the Initialise Action
 
 	/* Input Variables */
@@ -54,10 +56,13 @@ public class SMRental extends AOSimulationModel
 
 
 	// Constructor
-	public SMRental(double t0time, double tftime, /*define other args,*/ Seeds sd)
+	public SMRental(double t0time, double tftime, int vanCapacity, int numVans, int numRentalAgents, Seeds sd)
 	{
 		// Initialise parameters here
-		
+		this.vanCapacity = vanCapacity;
+		this.numVans = numVans;
+		this.numRentalAgents = numRentalAgents;
+
 		// Create RVP object with given seed
 		rvp = new RVPs(this,sd);
 		
