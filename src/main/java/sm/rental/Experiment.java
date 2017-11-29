@@ -15,7 +15,7 @@ class Experiment
        double startTime=0.0, endTime=660.0;
        Seeds[] sds = new Seeds[NUMRUNS];
        SMRental mname;  // Simulation object
-       int vanCapacity = 12;
+       int capacity = 12;
        int numVans = 3;
        int numRentalAgents = 99;
 
