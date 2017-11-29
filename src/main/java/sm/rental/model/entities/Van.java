@@ -24,16 +24,17 @@ public class Van {
     };
     @Getter private VansStatus status;
     private ArrayList<Customer> group;
-    @Getter private int capacity; //Number of seats left available.
+    @Getter private int capacity; //Maximum number of seats in the van.
     @Getter private double mileage; //Total number of miles driven by the van in the observation interval
+    @Getter private int seatsAvailable; //Number of available seats in the van
 
     // Required methods to manipulate the group
     public void insertGrp(Customer icgCustomer) {
         group.add(icgCustomer);
-        capacity -= icgCustomer.getNumPassengers();
+        seatsAvailable -= icgCustomer.getNumPassengers();
     }
     public boolean removeGrp(Customer icgCustomer) {
-        capacity += icgCustomer.getNumPassengers();
+        seatsAvailable += icgCustomer.getNumPassengers();
         return group.remove(icgCustomer);
     }
     public int getN() {
