@@ -29,8 +29,8 @@ public class Initialise extends ScheduledAction
 
 		ArrayList<Van> vans = model.getRgVans();
 		int numVans = model.getNumVans();
-		int vanCapacity = model.getVanCapacity();
+		int seatsAvailable = model.getCapacity();
 		vans.clear();
-		for(int i=0; i<numVans; i++) vans.add(new Van(vanCapacity));
+		for(int i=0; i<numVans; i++) vans.add(new Van(capacity));
 	}
 }
