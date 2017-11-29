@@ -22,9 +22,9 @@ public class SMRental extends AOSimulationModel
 {
 	// Constants available from Constants class
 	/* Parameter */
-	@Getter int vanCapacity;
+	@Getter int capacity;
 	@Getter int numVans;
-	@Getter int numRentalAgents;
+	@Getter int numAgents;
 
 	/*-------------Entity Data Structures-------------------*/
 	/* Group and Queue entities */
@@ -56,10 +56,10 @@ public class SMRental extends AOSimulationModel
 
 
 	// Constructor
-	public SMRental(double t0time, double tftime, int vanCapacity, int numVans, int numRentalAgents, Seeds sd)
+	public SMRental(double t0time, double tftime, int capacity, int numVans, int numRentalAgents, Seeds sd)
 	{
 		// Initialise parameters here
-		this.vanCapacity = vanCapacity;
+		this.capacity = capacity;
 		this.numVans = numVans;
 		this.numRentalAgents = numRentalAgents;
 
