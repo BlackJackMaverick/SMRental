@@ -5,34 +5,36 @@ import lombok.Getter;
 import java.util.ArrayList;
 
 public class Van {
-    private static enum VansStatus {
-                        BOARDING,
-                        EXITING,
-                        TRAVELLING,
-                        LOADING,
-                        UNLOADING,
-    };
-    private static enum VansLocation{
-                        T1;
-                        T2;
-                        DROP_OFF;
-                        RENTAL_COUNTER;
-    };
-    @Getter private VansStatus status;
-    @Getter private VansLocation location;
+    public enum VanStatus {
+        BOARDING,
+        EXITING,
+        TRAVELLING,
+        LOADING,
+        UNLOADING,
+    }
+
+    public enum VanLocation{
+        TERMINAL1,
+        TERMINAL2,
+        DROP_OFF,
+        RENTAL_COUNTER
+    }
+
+    @Getter private VanStatus status;
+    @Getter private VanLocation location;
     private ArrayList<Customer> group;
     @Getter private int capacity; //Maximum number of seats in the van.
     @Getter private double mileage; //Total number of miles driven by the van in the observation interval
     @Getter private int seatsAvailable; //Number of available seats in the van
 
     // Required methods to manipulate the group
-    public void insertGrp(Customer icgCustomer) {
-        group.add(icgCustomer);
-        seatsAvailable -= icgCustomer.getNumPassengers();
+    public void addCustomer(Customer customer) {
+        group.add(customer);
+        seatsAvailable -= customer.getNumPassengers();
     }
-    public boolean removeGrp(Customer icgCustomer) {
-        seatsAvailable += icgCustomer.getNumPassengers();
-        return group.remove(icgCustomer);
+    public boolean removeCustomer(Customer customer) {
+        seatsAvailable += customer.getNumPassengers();
+        return group.remove(customer);
     }
     public int getN() {
         return group.size();
@@ -41,8 +43,8 @@ public class Van {
     public Van(int capacity){
          this.capacity = capacity;
          this.group = new ArrayList<>();
-         this.status = VansStatus.BOARDING;
-         this.location = T1;
+         this.status = VanStatus.LOADING;
+         this.location = VanLocation.TERMINAL1;
     }
     public void addMileage(double milesTravelled){
         this.mileage += milesTravelled;

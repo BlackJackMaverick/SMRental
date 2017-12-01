@@ -22,9 +22,9 @@ public class SMRental extends AOSimulationModel
 {
 	// Constants available from Constants class
 	/* Parameter */
-	@Getter int capacity;
+	@Getter int numSeats;
 	@Getter int numVans;
-	@Getter int numAgents;
+	@Getter int numRentalAgents;
 
 	/*-------------Entity Data Structures-------------------*/
 	/* Group and Queue entities */
@@ -34,8 +34,7 @@ public class SMRental extends AOSimulationModel
 	@Getter private ArrayList<Van> rgVans;
 	@Getter private RentalCounter rgRentalCounter;
 
-	@Getter private ArrayList<Customer> Terminal1 = new ArrayList<Customer>();
-	@Getter private ArrayList<Customer> Terminal2 = new ArrayList<Customer>();
+	@Getter private ArrayList<ArrayList<Customer>> Terminals = new ArrayList<>();
 	@Getter private ArrayList<Customer> ReturnLine = new ArrayList<Customer>();
 	@Getter private ArrayList<Customer> RentalLine = new ArrayList<Customer>();
 	// Objects can be created here or in the Initialise Action
@@ -56,10 +55,10 @@ public class SMRental extends AOSimulationModel
 
 
 	// Constructor
-	public SMRental(double t0time, double tftime, int capacity, int numVans, int numRentalAgents, Seeds sd)
+	public SMRental(double t0time, double tftime, int numSeats, int numVans, int numRentalAgents, Seeds sd)
 	{
 		// Initialise parameters here
-		this.capacity = capacity;
+		this.numSeats = numSeats;
 		this.numVans = numVans;
 		this.numRentalAgents = numRentalAgents;
 

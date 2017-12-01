@@ -1,6 +1,5 @@
 package sm.rental.model.actions;
 
-import simulationModelling.*;
 import simulationModelling.ScheduledAction;
 import sm.rental.model.SMRental;
 import sm.rental.model.entities.Van;
@@ -24,13 +23,13 @@ public class Initialise extends ScheduledAction
 	{
 		model.getRentalLine().clear();
 		model.getReturnLine().clear();
-		model.getTerminal1().clear();
-		model.getTerminal2().clear();
+		model.getTerminals().get(0).clear();
+		model.getTerminals().get(1).clear();
 
 		ArrayList<Van> vans = model.getRgVans();
 		int numVans = model.getNumVans();
-		int seatsAvailable = model.getCapacity();
 		vans.clear();
-		for(int i=0; i<numVans; i++) vans.add(new Van(capacity));
+		for(int i=0; i<numVans; i++)
+		    vans.add(new Van(model.getNumSeats()));
 	}
 }

@@ -1,10 +1,12 @@
 package sm.rental.model.actions;
 
 import simulationModelling.ScheduledAction;
+import sm.rental.model.SMRental;
+import sm.rental.model.entities.Customer;
 
-class NewCustomerArrivalT1 extends ScheduledAction{
+class NewArrivalT1 extends ScheduledAction{
     SMRental model;
-    public NewCustomerArrivalT1(SMRental model){
+    public NewArrivalT1(SMRental model){
         this.model=model;
     }
 
@@ -14,10 +16,9 @@ class NewCustomerArrivalT1 extends ScheduledAction{
 
     public void actionEvent(){
         double startTime = model.getClock();
-        CustomerType uType = model.NEW;
         int numPassengers = model.rvp.uNumPassengers();
 
-        Customer icgCustomer= new Customer( startTime, uType, numPassengers );
-        model.Terminal1.spInsertQue(icgCustomer);
+        Customer icgCustomer= new Customer( startTime, Customer.CustomerType.NEW, numPassengers );
+        model.getTerminals().get(0).add(icgCustomer);
     }
 }
