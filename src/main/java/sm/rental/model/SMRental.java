@@ -9,6 +9,7 @@ import simulationModelling.SequelActivity;
 import sm.rental.model.entities.Customer;
 import sm.rental.model.entities.RentalCounter;
 import sm.rental.model.entities.Van;
+import sm.rental.model.outputs.DSOV;
 import sm.rental.model.outputs.SSOV;
 import sm.rental.model.procedures.DVPs;
 import sm.rental.model.procedures.RVPs;
@@ -22,9 +23,9 @@ public class SMRental extends AOSimulationModel
 {
 	// Constants available from Constants class
 	/* Parameter */
-	@Getter int numSeats;
-	@Getter int numVans;
-	@Getter int numRentalAgents;
+	@Getter private int numSeats;
+	@Getter private int numVans;
+	@Getter private int numRentalAgents;
 
 	/*-------------Entity Data Structures-------------------*/
 	/* Group and Queue entities */
@@ -42,21 +43,22 @@ public class SMRental extends AOSimulationModel
 	/* Input Variables */
 	// Define any Independent Input Variables here
 	
-	// References to RVP and DVP objects
+	// References to RVP object
 	@Getter private RVPs rvp;  // Reference to rvp object - object created in constructor
-	@Getter private DVPs dvp;  // Reference to dvp object
 
 	// SSOV object
-	@Getter protected SSOV output1 = new SSOV(this);
-	
-	// SSOV values - define the public methods that return values
-	// required for experimentation.
+	@Getter private SSOV ssovs;
+    // DSOV object
+    @Getter private DSOV dsovs;
 
-
-	// Constructor
+    // Constructor
 	public SMRental(double t0time, double tftime, int numSeats, int numVans, int numRentalAgents, Seeds sd) {
         // Setup procedures
         UDPs.ConfigureUDPs(this);
+
+        // Setup outputs
+        ssovs = new SSOV(this);
+        dsovs = new DSOV(this);
 
         // Initialise parameters here
 		this.numSeats = numSeats;
@@ -68,8 +70,9 @@ public class SMRental extends AOSimulationModel
 
 		// Create Structural Entities Corresponding to Resources
         qTerminals = new ArrayList<>();
-        qTerminals.add(new LinkedList<Customer>());
-        qTerminals.add(new LinkedList<Customer>());
+        qTerminals.add(new LinkedList<>());
+        qTerminals.add(new LinkedList<>());
+
         qReturnLine = new LinkedList<>();
         qRentalLine = new LinkedList<>();
         rgRentalCounter = new RentalCounter(numRentalAgents);
@@ -78,7 +81,7 @@ public class SMRental extends AOSimulationModel
 		// Initialise the simulation model
 		initAOSimulModel(t0time,tftime);   
 
-		     // Schedule the first arrivals and employee scheduling
+        // Schedule the first arrivals and employee scheduling
 		Initialise init = new Initialise(this);
 		scheduleAction(init);  // Should always be first one scheduled.
 		// Schedule other scheduled actions and acitvities here

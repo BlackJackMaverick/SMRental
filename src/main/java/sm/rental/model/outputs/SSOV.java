@@ -18,11 +18,11 @@ public class SSOV
 	public void addSatisfiedCust(){
 		numSatisfied++;
 		numServed++;
-		customerSatisfactionRate = numSatisfied/numServed;
+		customerSatisfactionRate = (double)numSatisfied/(double)numServed;
 	}
 
 	public void addUnsatisfiedCust(){
 		numServed++;
-		customerSatisfactionRate = numSatisfied/numServed;
+		customerSatisfactionRate = (double)numSatisfied/(double)numServed;
 	}
 }
