@@ -44,7 +44,7 @@ public class SMRental extends AOSimulationModel
 	
 	// References to RVP and DVP objects
 	@Getter private RVPs rvp;  // Reference to rvp object - object created in constructor
-	@Getter private DVPs dvp = new DVPs(this);  // Reference to dvp object
+	@Getter private DVPs dvp;  // Reference to dvp object
 
 	// Output_1 object
 	@Getter protected Output_1 output1 = new Output_1(this);
@@ -64,7 +64,7 @@ public class SMRental extends AOSimulationModel
 
 		// Create RVP object with given seed
 		rvp = new RVPs(this,sd);
-		
+		dvp = new DVPs(this);
 		// Create Structural Entities Corresponding to Resources
         qTerminals = new ArrayList<>();
         qTerminals.add(new LinkedList<Customer>());

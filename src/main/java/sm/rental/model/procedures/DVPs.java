@@ -1,6 +1,7 @@
 package sm.rental.model.procedures;
 
 import sm.rental.model.SMRental;
+import sm.rental.model.entities.Van;
 
 public class DVPs
 {
@@ -23,4 +24,8 @@ public class DVPs
 	   return(nextTime);
 	}
 	------------------------------------------------------------*/
+
+    public double travelTime(Van.VanLocation source, Van.VanLocation destination){
+        return 0.0;
+    }
 }
