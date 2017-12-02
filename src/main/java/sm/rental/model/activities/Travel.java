@@ -7,6 +7,7 @@ import sm.rental.model.SMRental;
 
 import sm.rental.model.entities.Van;
 import sm.rental.model.entities.Van.*;
+import sm.rental.model.procedures.DVPs;
 import sm.rental.model.procedures.UDPs;
 
 import java.util.Optional;
@@ -31,7 +32,7 @@ public class Travel extends ConditionalActivity {
     }
 
     public double duration(){
-        return model.getDvp().travelTime(rgVan.getLocation(), nextDestination );
+        return DVPs.travelTime(rgVan.getLocation(), nextDestination);
     }
 
     public void terminatingEvent(){
