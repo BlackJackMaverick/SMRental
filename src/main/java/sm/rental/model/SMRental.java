@@ -9,7 +9,7 @@ import simulationModelling.SequelActivity;
 import sm.rental.model.entities.Customer;
 import sm.rental.model.entities.RentalCounter;
 import sm.rental.model.entities.Van;
-import sm.rental.model.outputs.Output_1;
+import sm.rental.model.outputs.SSOV;
 import sm.rental.model.procedures.DVPs;
 import sm.rental.model.procedures.RVPs;
 import sm.rental.model.actions.Initialise;
@@ -46,10 +46,10 @@ public class SMRental extends AOSimulationModel
 	@Getter private RVPs rvp;  // Reference to rvp object - object created in constructor
 	@Getter private DVPs dvp;  // Reference to dvp object
 
-	// Output_1 object
-	@Getter protected Output_1 output1 = new Output_1(this);
+	// SSOV object
+	@Getter protected SSOV output1 = new SSOV(this);
 	
-	// Output_1 values - define the public methods that return values
+	// SSOV values - define the public methods that return values
 	// required for experimentation.
 
 
@@ -102,7 +102,7 @@ public class SMRental extends AOSimulationModel
 		// Can add other debug code to monitor the status of the system
 		// See examples for suggestions on setup logging
 
-		// Setup an updateTrjSequences() method in the Output_1 class
+		// Setup an updateTrjSequences() method in the SSOV class
 		// and call here if you have Trajectory Sets
 		// updateTrjSequences() 
 	}
