@@ -1,24 +1,25 @@
 package sm.rental.model.actions;
 
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import simulationModelling.ScheduledAction;
 import sm.rental.model.SMRental;
 import sm.rental.model.entities.Customer;
+import sm.rental.model.entities.Customer.CustomerType;
 
-class NewArrivalT2 extends ScheduledAction{
-    SMRental model;
-    public NewArrivalT2(SMRental model){
-        this.model=model;
-    }
+@RequiredArgsConstructor
+public class NewArrivalT2 extends ScheduledAction{
+    @NonNull private final SMRental model;
 
     public double timeSequence(){
-        return model.rvp.DuNCustomerT1();
+        return model.getRvp().DuNCustomerT1();
     }
 
     public void actionEvent(){
         double startTime = model.getClock();
-        int numPassengers = model.rvp.uNumPassengers();
+        int numPassengers = model.getRvp().uNumPassengers();
 
-        Customer icgCustomer = new Customer( startTime, Customer.CustomerType.NEW, numPassengers );
-        model.getTerminals().get(1).add(icgCustomer);
+        Customer icgCustomer = new Customer( startTime, CustomerType.NEW, numPassengers );
+        model.getQTerminals().get(1).add(icgCustomer);
     }
 }

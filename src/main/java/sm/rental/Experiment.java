@@ -26,9 +26,8 @@ class Experiment
        // Loop for NUMRUN simulation runs for each case
        // Case 1
        System.out.println(" Case 1");
-       for(i=0 ; i < NUMRUNS ; i++)
-       {
-          mname = new SMRental(startTime,endTime,vanCapacity,numVans,numRentalAgents,sds[i]);
+       for(i=0 ; i < NUMRUNS ; i++) {
+          mname = new SMRental(startTime,endTime,capacity,numVans,numRentalAgents,sds[i]);
           mname.runSimulation();
        }
    }

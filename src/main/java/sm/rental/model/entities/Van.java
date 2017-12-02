@@ -1,9 +1,12 @@
 package  sm.rental.model.entities;
 
-import lombok.Getter;
+import lombok.*;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
+@Data
+@RequiredArgsConstructor
 public class Van {
     public enum VanStatus {
         BOARDING,
@@ -19,34 +22,27 @@ public class Van {
         DROP_OFF,
         RENTAL_COUNTER
     }
-
     @Getter private VanStatus status;
     @Getter private VanLocation location;
-    private ArrayList<Customer> group;
+    private LinkedList<Customer> group;
     @Getter private int capacity; //Maximum number of seats in the van.
     @Getter private double mileage; //Total number of miles driven by the van in the observation interval
-    @Getter private int seatsAvailable; //Number of available seats in the van
+    @NonNull @Getter private final Integer seatsAvailable; //Number of available seats in the van
 
     // Required methods to manipulate the group
     public void addCustomer(Customer customer) {
-        group.add(customer);
-        seatsAvailable -= customer.getNumPassengers();
+        group.offerLast(customer);
     }
-    public boolean removeCustomer(Customer customer) {
-        seatsAvailable += customer.getNumPassengers();
-        return group.remove(customer);
+
+    public Customer removeNextCustomer() {
+        return group.pop();
     }
+
     public int getN() {
         return group.size();
     }
 
-    public Van(int capacity){
-         this.capacity = capacity;
-         this.group = new ArrayList<>();
-         this.status = VanStatus.LOADING;
-         this.location = VanLocation.TERMINAL1;
-    }
     public void addMileage(double milesTravelled){
-        this.mileage += milesTravelled;
+        mileage += milesTravelled;
     }
 }

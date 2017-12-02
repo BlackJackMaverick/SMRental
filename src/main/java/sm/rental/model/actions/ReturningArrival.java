@@ -1,24 +1,23 @@
 package sm.rental.model.actions;
 
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import simulationModelling.ScheduledAction;
 import sm.rental.model.SMRental;
 import sm.rental.model.entities.Customer;
 
+@RequiredArgsConstructor
 class ReturningArrival extends ScheduledAction{
-    SMRental model;
-    public ReturningArrival(SMRental model){
-        this.model=model;
-    }
+    @NonNull private final SMRental model;
 
     public double timeSequence(){
-        return model.rvp.DuRCustomer();
+        return model.getRvp().DuRCustomer();
     }
 
     public void actionEvent(){
         double startTime = model.getClock();
-        int numPassengers = model.rvp.uNumPassengers();
-
+        int numPassengers = model.getRvp().uNumPassengers();
         Customer icgCustomer = new Customer( startTime, Customer.CustomerType.RETURNING, numPassengers );
-        model.getRentalLine().add(icgCustomer);
+        model.getQRentalLine().offerLast(icgCustomer);
     }
 }

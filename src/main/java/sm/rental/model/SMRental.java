@@ -12,8 +12,8 @@ import sm.rental.model.entities.Van;
 import sm.rental.model.outputs.Output_1;
 import sm.rental.model.procedures.DVPs;
 import sm.rental.model.procedures.RVPs;
-import sm.rental.model.procedures.UDPs;
 import sm.rental.model.actions.Initialise;
+import sm.rental.model.procedures.UDPs;
 
 
 //
@@ -30,33 +30,33 @@ public class SMRental extends AOSimulationModel
 	/* Group and Queue entities */
 	// Define the reference variables to the various 
 	// entities with scope Set and Unary
-
 	@Getter private ArrayList<Van> rgVans;
 	@Getter private RentalCounter rgRentalCounter;
 
-	@Getter private ArrayList<ArrayList<Customer>> Terminals = new ArrayList<>();
-	@Getter private ArrayList<Customer> ReturnLine = new ArrayList<Customer>();
-	@Getter private ArrayList<Customer> RentalLine = new ArrayList<Customer>();
+	@Getter private ArrayList<LinkedList<Customer>> qTerminals;
+	@Getter private LinkedList<Customer> qReturnLine;
+	@Getter private LinkedList<Customer> qRentalLine;
+
 	// Objects can be created here or in the Initialise Action
 
 	/* Input Variables */
-	// Define any Independent Input Varaibles here
+	// Define any Independent Input Variables here
 	
 	// References to RVP and DVP objects
-	protected RVPs rvp;  // Reference to rvp object - object created in constructor
-	protected DVPs dvp = new DVPs(this);  // Reference to dvp object
-	protected UDPs udp = new UDPs(this);
+	@Getter private RVPs rvp;  // Reference to rvp object - object created in constructor
+	@Getter private DVPs dvp = new DVPs(this);  // Reference to dvp object
 
 	// Output_1 object
-	protected Output_1 output1 = new Output_1(this);
+	@Getter protected Output_1 output1 = new Output_1(this);
 	
 	// Output_1 values - define the public methods that return values
 	// required for experimentation.
 
 
 	// Constructor
-	public SMRental(double t0time, double tftime, int numSeats, int numVans, int numRentalAgents, Seeds sd)
-	{
+	public SMRental(double t0time, double tftime, int numSeats, int numVans, int numRentalAgents, Seeds sd) {
+        // Setup procedures
+        UDPs.ConfigureUDPs(this);
 		// Initialise parameters here
 		this.numSeats = numSeats;
 		this.numVans = numVans;
@@ -65,8 +65,15 @@ public class SMRental extends AOSimulationModel
 		// Create RVP object with given seed
 		rvp = new RVPs(this,sd);
 		
-		// rgCounter and qCustLine objects created in Initalise Action
-		
+		// Create Structural Entities Corresponding to Resources
+        qTerminals = new ArrayList<>();
+        qTerminals.add(new LinkedList<Customer>());
+        qTerminals.add(new LinkedList<Customer>());
+        qReturnLine = new LinkedList<>();
+        qRentalLine = new LinkedList<>();
+        rgRentalCounter = new RentalCounter(numRentalAgents);
+        rgVans = new ArrayList<>();
+
 		// Initialise the simulation model
 		initAOSimulModel(t0time,tftime);   
 
@@ -74,6 +81,7 @@ public class SMRental extends AOSimulationModel
 		Initialise init = new Initialise(this);
 		scheduleAction(init);  // Should always be first one scheduled.
 		// Schedule other scheduled actions and acitvities here
+
 	}
 
 	/************  Implementation of Data Modules***********/	
@@ -107,5 +115,3 @@ public class SMRental extends AOSimulationModel
 	}	
 
 }
-
-
