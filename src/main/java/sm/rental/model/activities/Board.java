@@ -1,86 +1,86 @@
 package sm.rental.model.activities;
 
-import static smrental.Constants.*;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import sm.rental.model.SMRental;
 import sm.rental.model.entities.Van;
+import sm.rental.model.entities.Van.VanStatus;
+import sm.rental.model.entities.Van.VanLocation;
 import sm.rental.model.entities.Customer;
 import simulationModelling.ConditionalActivity;
+import sm.rental.model.procedures.UDPs;
 
-public class Board extends ConditionalActivity{
-    private SMRental model;
-    private Customer CCustomer;
-    private van CVan;
+import java.util.LinkedList;
+import java.util.Optional;
 
-    public Board (SMRental model){
-        this.model = model;
-    }
+@RequiredArgsConstructor
+public class Board extends ConditionalActivity {
+    @NonNull private final SMRental model;
+    private Customer customer;
+    private Van van;
 
     public static boolean precondition (SMRental model){
-        return model.udp.CanBoardVan(CVan.VanStatus);
+        return canCustomerBoardVan(model);
     }
 
-    /* UDP function CanBoardVan()
-    //need to import van and customer for this function
-    //also need to set variables CCustomer and CVan
-    //in customer.java, needs a getCapacity() function
-
-    public boolean CanBoardVan(VanStatus status){
-    boolean check = false;
-        if(status == VanStatus.BOARDING_T1 || status == VanStatus.BOARDING_T2 || status == VanStatus.BOARDING_RC){
-            if(CVan.getCapacity() >= CCustomer.numPassengers+1){
-            check = true;
-            }
-            return check;
-        }else{
-        return check;
-        }
+    @SneakyThrows
+    public void startingEvent(){
+        Optional<Van> possibleVan = getVanForBoarding(model);
+        if(!possibleVan.isPresent())
+            throw new RuntimeException("Event Started but precondition must've been false: No van present");
+        van = possibleVan.get();
+        Optional<Customer> possibleCustomer = getCustomerToBoard(model, van);
+        if(!possibleCustomer.isPresent())
+            throw new RuntimeException("Event Started but precondition must've been false: No customer present");
+        customer = possibleCustomer.get();
+        UDPs.UpdateVanStatus(van, VanStatus.BOARDING);
     }
-    */
 
     protected double duration(){
-        return this.model.rvp.uBoardingTime(this.CCustomer.numPassengers);
+        return model.getRvp().uBoardingTime(customer.getNumPassengers());
     }
 
-    public void eventStart(){
-        this.CVan = this.model.udp.GetVanForBoarding();
-        this.CCustomer = this.model.udp.GetCustomerForBoarding(CVan);
-        this.model.udp.UpdateVanStatus(CVan,"BOARDING");
+
+    public void terminatingEvent(){
+        van.addCustomer(customer);
+        UDPs.UpdateVanStatus(van, VanStatus.LOADING);
     }
 
-    /*
-    //UDP function GetVanForBoarding()
-    public Van GetVanForBoarding(){
-
+    //
+    private static boolean canCustomerBoardVan(SMRental model){
+        Optional<Van> possibleVan = getVanForBoarding(model);
+        return possibleVan.isPresent() &&
+                canCustomerBoard(model, possibleVan.get());
     }
 
-    //UDP function GetCustomerForBoarding
-    public Customer GetCustomerForBoarding(Van v){
-
+    private static Optional<Van> getVanForBoarding(SMRental model){
+         return model.getRgVans().stream()
+                .filter(van -> van.getStatus() == VanStatus.LOADING)
+                .findFirst();
     }
 
-    //UDP function UpdateVanStatus(Van, "BOARDING")
-    public void UpdateVanStatus(Van v, String s){
-    if(s.equals("BOARDING")){
-        v.VanStatus = VanStatus.BOARDING;
-     }else if (s.equals("LOADING")){
-       v.VanStatus = VanStatus.LOADING;
-     }
+    private static boolean canCustomerBoard(SMRental model, Van van) {
+        Optional<LinkedList<Customer>> queue = getLocationForBoarding(model, van);
+        return queue.isPresent() &&
+                queue.get().stream()
+                        .anyMatch(customer -> customer.getNumPassengers() <= van.getSeatsAvailable());
     }
 
-     */
-
-
-    public void eventEnd(){
-        this.model.udp.AddCustomerToVan(CVan, CCustomer);
-        this.model.udp.UpdateVanStatus(CVan, "LOADING");
+    private static Optional<Customer> getCustomerToBoard(SMRental model, Van van){
+        Optional<LinkedList<Customer>> queue = getLocationForBoarding(model, van);
+        if(!queue.isPresent()) return Optional.empty();
+        Optional<Customer> possibleCustomer = queue.get().stream()
+                .filter(customer -> customer.getNumPassengers() <= van.getSeatsAvailable())
+                .findFirst();
+        possibleCustomer.ifPresent(queue.get()::remove);
+        return possibleCustomer;
     }
 
-    /*
-    //UDP function AddCustomerToVan(Van, Customer)
-
-    public void AddCustomerToVan(Van v, Customer c){
-        v.insertGrp(c);
+    private static Optional<LinkedList<Customer>> getLocationForBoarding(SMRental model, Van van){
+        if(van.getLocation() == VanLocation.TERMINAL1) return Optional.of(model.getQTerminals().get(0));
+        else if(van.getLocation() == VanLocation.TERMINAL2) return Optional.of(model.getQTerminals().get(1));
+        else if(van.getLocation() == VanLocation.RENTAL_COUNTER) return Optional.of(model.getQReturnLine());
+        else return Optional.empty();
     }
-     */
-
 }

@@ -11,10 +11,12 @@ import sm.rental.model.entities.Van;
 import sm.rental.model.entities.Van.VanStatus;
 import sm.rental.model.procedures.UDPs;
 
+import java.util.Optional;
+
 @RequiredArgsConstructor
 public class ExitVan extends ConditionalActivity{
     @NonNull private final SMRental model;
-    private Van rgVan = null;
+    private Van van = null;
     private Customer icgCustomer = null;
 
     public static boolean precondition(SMRental model){
@@ -22,9 +24,15 @@ public class ExitVan extends ConditionalActivity{
     }
 
     public void startingEvent(){
-        rgVan = getVanForUnloading();
-        icgCustomer = rgVan.removeNextCustomer();
-        UDPs.UpdateVanStatus(rgVan, VanStatus.EXITING);
+        Optional<Van> possibleVan = getVanForUnloading(model);
+        if(!possibleVan.isPresent())
+            throw new RuntimeException("Event Started but precondition must've been false: No van present");
+        van = possibleVan.get();
+        Optional<Customer> possibleCustomer = van.removeNextCustomer();
+        if(!possibleCustomer.isPresent())
+            throw new RuntimeException("Event Started but precondition must've been false: No customer present");
+        icgCustomer = possibleCustomer.get();
+        UDPs.UpdateVanStatus(van, VanStatus.EXITING);
     }
 
     public double duration() {
@@ -32,10 +40,10 @@ public class ExitVan extends ConditionalActivity{
     }
 
     public void terminatingEvent(){
-        if(rgVan.getSeatsAvailable() == rgVan.getCapacity()){
-            UDPs.UpdateVanStatus(rgVan, VanStatus.LOADING);
+        if(van.getSeatsAvailable() == van.getCapacity()){
+            UDPs.UpdateVanStatus(van, VanStatus.LOADING);
         } else {
-            UDPs.UpdateVanStatus(rgVan, VanStatus.UNLOADING);
+            UDPs.UpdateVanStatus(van, VanStatus.UNLOADING);
         }
         if(icgCustomer.getUType() == CustomerType.NEW){
             model.getQRentalLine().offerLast(icgCustomer);
@@ -50,9 +58,9 @@ public class ExitVan extends ConditionalActivity{
                 .anyMatch(van -> van.getStatus() == VanStatus.UNLOADING && van.getN() > 0);
     }
 
-    private Van getVanForUnloading(){
+    private static Optional<Van> getVanForUnloading(SMRental model){
         return model.getRgVans().stream()
                 .filter(van -> van.getStatus() == VanStatus.UNLOADING && van.getN() > 0)
-                .findFirst().get();
+                .findFirst();
     }
 }
