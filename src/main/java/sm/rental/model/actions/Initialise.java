@@ -22,15 +22,9 @@ public class Initialise extends ScheduledAction
 
 	protected void actionEvent() 
 	{
-		model.getRentalLine().clear();
-		model.getReturnLine().clear();
-		model.getTerminal1().clear();
-		model.getTerminal2().clear();
-
 		ArrayList<Van> vans = model.getRgVans();
 		int numVans = model.getNumVans();
 		int vanCapacity = model.getVanCapacity();
-		vans.clear();
 		for(int i=0; i<numVans; i++) vans.add(new Van(vanCapacity));
 	}
 }
