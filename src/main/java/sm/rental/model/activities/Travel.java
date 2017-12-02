@@ -1,58 +1,78 @@
 package sm.rental.model.activities;
 
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import simulationModelling.ConditionalActivity;
 import sm.rental.model.SMRental;
 
-import lombok.Getter;
-import simulationModelling.ConditionalActivity;
-import sm.rental.model.SMRental;
 import sm.rental.model.entities.Van;
-import sm.rental.model.procedures.DVPs;
-import sm.rental.model.procedures.RVPs;
+import sm.rental.model.entities.Van.*;
 import sm.rental.model.procedures.UDPs;
 
+import java.util.Optional;
+
+@RequiredArgsConstructor
 public class Travel extends ConditionalActivity {
-    @Getter SMRental model;
-    UDPs udp;
-    Van rgVan;
-    DVPs dvp;
+    @NonNull private final SMRental model;
+    private Van rgVan;
+    private VanLocation nextDestination;
 
-    public Travel(SMRental model){ this.model = model; }
     public static boolean precondition(SMRental model){
-        boolean returnValue = false;
-
-        if (model.udp.CanUnloadVan() == true){
-
-            returnValue = true;
-        };
-        return returnValue;
+        return canUnloadVan(model);
     }
+
     public void startingEvent() {
-        rgVan = this.model.udp.GetVanForTravel();
-        VanLocation nextDestination = this.model.udp.GetNextDestinationForVan(rgVan);
-        this.model.udp.UpdateVanStatus( rgVan, "TRAVELLING");
+        Optional<Van> possibleVan = getVanForTravel(model);
+        if(!possibleVan.isPresent())
+            throw new RuntimeException("Event Started but precondition must've been false: No van present");
+        rgVan = possibleVan.get();
+        nextDestination = getNextDestinationForVan(rgVan);
+        UDPs.UpdateVanStatus(rgVan, VanStatus.TRAVELLING);
     }
-    protected double duration(){
 
-        return (this.model.dvp.travelTime( rgVan,nextDestination ));
-
+    public double duration(){
+        return model.getDvp().travelTime(rgVan.getLocation(), nextDestination );
     }
+
     public void terminatingEvent(){
-        this.model.udp.UpdateVanLocation( rgVan,nextDestination);
-        if( nextDestination.equals("RENTAL_COUNTER" || nextDestination.equals("DROP_OFF"))){
-            if( rgVan.getSeatsAvailable() != rgVan.getCapacity()){
-                this.model.udp.UpdateVanStatus( rgVan,"UNLOADING");
-            }
-
-        }
-        else{
-            this.model.udp.UpdateVanStatus( rgVan,"UNLOADING");
-        }
+        updateVanLocation(rgVan, nextDestination);
+        if( nextDestination == VanLocation.RENTAL_COUNTER || nextDestination == VanLocation.DROP_OFF){
+            if( rgVan.getSeatsAvailable() < rgVan.getCapacity())
+                UDPs.UpdateVanStatus(rgVan, VanStatus.UNLOADING);
+        } else UDPs.UpdateVanStatus(rgVan, VanStatus.LOADING);
     }
 
+    //Local User Defined Procedures
+    private static boolean canUnloadVan(SMRental model){
+        return model.getRgVans().stream()
+                .anyMatch(van -> van.getStatus() == VanStatus.UNLOADING && van.getN() > 0);
+    }
 
+    private static Optional<Van> getVanForTravel(SMRental model){
+        return model.getRgVans().stream()
+                .filter(van -> van.getStatus() == VanStatus.UNLOADING && van.getN() > 0)
+                .findFirst();
+    }
 
+    private static VanLocation getNextDestinationForVan(Van van){
+        switch (van.getLocation()){
+            case TERMINAL1:
+                return VanLocation.TERMINAL2;
+            case TERMINAL2:
+                return VanLocation.RENTAL_COUNTER;
+            case RENTAL_COUNTER:
+                if(van.getN() > 0)
+                    return VanLocation.DROP_OFF;
+                else
+                    return VanLocation.TERMINAL1;
+            case DROP_OFF:
+                return VanLocation.TERMINAL1;
+        }
+        throw new IllegalStateException("Van Location doesn't exist");
+    }
 
-
+    private static void updateVanLocation(Van van, VanLocation destination){
+        van.setLocation(destination);
+    }
 
 }
