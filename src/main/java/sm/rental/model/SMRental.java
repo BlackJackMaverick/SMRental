@@ -57,14 +57,15 @@ public class SMRental extends AOSimulationModel
 	public SMRental(double t0time, double tftime, int numSeats, int numVans, int numRentalAgents, Seeds sd) {
         // Setup procedures
         UDPs.ConfigureUDPs(this);
-		// Initialise parameters here
+
+        // Initialise parameters here
 		this.numSeats = numSeats;
 		this.numVans = numVans;
 		this.numRentalAgents = numRentalAgents;
 
 		// Create RVP object with given seed
 		rvp = new RVPs(this,sd);
-		dvp = new DVPs(this);
+
 		// Create Structural Entities Corresponding to Resources
         qTerminals = new ArrayList<>();
         qTerminals.add(new LinkedList<Customer>());
