@@ -4,6 +4,7 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Optional;
 
 @Data
 @RequiredArgsConstructor
@@ -34,8 +35,8 @@ public class Van {
         group.offerLast(customer);
     }
 
-    public Customer removeNextCustomer() {
-        return group.pop();
+    public Optional<Customer> removeNextCustomer() {
+        return Optional.ofNullable(group.pop());
     }
 
     public int getN() {
