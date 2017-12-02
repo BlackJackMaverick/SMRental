@@ -1,4 +1,5 @@
 package sm.rental.model.activities;
+
 import lombok.Getter;
 import simulationModelling.ConditionalActivity;
 import sm.rental.model.SMRental;

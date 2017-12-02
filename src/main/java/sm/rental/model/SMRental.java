@@ -12,9 +12,8 @@ import sm.rental.model.entities.Van;
 import sm.rental.model.outputs.Output_1;
 import sm.rental.model.procedures.DVPs;
 import sm.rental.model.procedures.RVPs;
-import sm.rental.model.procedures.UDPs;
 import sm.rental.model.actions.Initialise;
-import sm.rental.model.activities.Service;
+import sm.rental.model.procedures.UDPs;
 
 
 //
@@ -23,7 +22,7 @@ public class SMRental extends AOSimulationModel
 {
 	// Constants available from Constants class
 	/* Parameter */
-	@Getter int vanCapacity;
+	@Getter int numSeats;
 	@Getter int numVans;
 	@Getter int numRentalAgents;
 
@@ -31,11 +30,10 @@ public class SMRental extends AOSimulationModel
 	/* Group and Queue entities */
 	// Define the reference variables to the various 
 	// entities with scope Set and Unary
-
 	@Getter private ArrayList<Van> rgVans;
 	@Getter private RentalCounter rgRentalCounter;
 
-	@Getter private ArrayList<LinkedList<Customer>> qTerminal;
+	@Getter private ArrayList<LinkedList<Customer>> qTerminals;
 	@Getter private LinkedList<Customer> qReturnLine;
 	@Getter private LinkedList<Customer> qRentalLine;
 
@@ -56,10 +54,11 @@ public class SMRental extends AOSimulationModel
 
 
 	// Constructor
-	public SMRental(double t0time, double tftime, int vanCapacity, int numVans, int numRentalAgents, Seeds sd)
-	{
+	public SMRental(double t0time, double tftime, int numSeats, int numVans, int numRentalAgents, Seeds sd) {
+        // Setup procedures
+        UDPs.ConfigureUDPs(this);
 		// Initialise parameters here
-		this.vanCapacity = vanCapacity;
+		this.numSeats = numSeats;
 		this.numVans = numVans;
 		this.numRentalAgents = numRentalAgents;
 
@@ -67,7 +66,9 @@ public class SMRental extends AOSimulationModel
 		rvp = new RVPs(this,sd);
 		
 		// Create Structural Entities Corresponding to Resources
-        qTerminal = new ArrayList<>();
+        qTerminals = new ArrayList<>();
+        qTerminals.add(new LinkedList<Customer>());
+        qTerminals.add(new LinkedList<Customer>());
         qReturnLine = new LinkedList<>();
         qRentalLine = new LinkedList<>();
         rgRentalCounter = new RentalCounter(numRentalAgents);
@@ -114,5 +115,3 @@ public class SMRental extends AOSimulationModel
 	}	
 
 }
-
-
