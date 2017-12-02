@@ -1,51 +1,48 @@
 package  sm.rental.model.entities;
 
-import lombok.Getter;
+import lombok.*;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
+@Data
+@RequiredArgsConstructor
 public class Van {
-    private static enum VansStatus {
-                        BOARDING_T1,
-                        BOARDING_T2,
-                        BOARDING_RC,
-                        EXITING_DP,
-                        EXITING_RC,
-                        TRAVELLING_TO_T1_FROM_DP,
-                        TRAVELLING_TO_T1_FROM_RC,
-                        TRAVELLING_TO_T2,
-                        TRAVELLING_TO_RC,
-                        TRAVELLING_TO_DP,
-                        LOADING_T1,
-                        LOADING_T2,
-                        LOADING_RC,
-                        UNLOADING_RC,
-                        UNLOADING_DP
-    };
-    @Getter private VansStatus status;
-    private ArrayList<Customer> group;
-    @Getter private int capacity; //Number of seats left available.
+    public enum VanStatus {
+        BOARDING,
+        EXITING,
+        TRAVELLING,
+        LOADING,
+        UNLOADING,
+    }
+
+    public enum VanLocation{
+        TERMINAL1,
+        TERMINAL2,
+        DROP_OFF,
+        RENTAL_COUNTER
+    }
+    @Getter private VanStatus status;
+    @Getter private VanLocation location;
+    private LinkedList<Customer> group;
+    @Getter private int capacity; //Maximum number of seats in the van.
     @Getter private double mileage; //Total number of miles driven by the van in the observation interval
+    @NonNull @Getter private final Integer seatsAvailable; //Number of available seats in the van
 
     // Required methods to manipulate the group
-    public void insertGrp(Customer icgCustomer) {
-        group.add(icgCustomer);
-        capacity -= icgCustomer.getNumPassengers();
+    public void addCustomer(Customer customer) {
+        group.offerLast(customer);
     }
-    public boolean removeGrp(Customer icgCustomer) {
-        capacity += icgCustomer.getNumPassengers();
-        return group.remove(icgCustomer);
+
+    public Customer removeNextCustomer() {
+        return group.pop();
     }
+
     public int getN() {
         return group.size();
     }
 
-    public Van(int capacity){
-         this.capacity = capacity;
-         this.group = new ArrayList<>();
-         this.status = VansStatus.LOADING_T1;
-    }
     public void addMileage(double milesTravelled){
-        this.mileage += milesTravelled;
+        mileage += milesTravelled;
     }
 }
