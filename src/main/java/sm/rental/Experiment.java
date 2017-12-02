@@ -15,7 +15,7 @@ class Experiment
        double startTime=0.0, endTime=660.0;
        Seeds[] sds = new Seeds[NUMRUNS];
        SMRental mname;  // Simulation object
-       int vanCapacity = 12;
+       int capacity = 12;
        int numVans = 3;
        int numRentalAgents = 99;
 
@@ -26,9 +26,8 @@ class Experiment
        // Loop for NUMRUN simulation runs for each case
        // Case 1
        System.out.println(" Case 1");
-       for(i=0 ; i < NUMRUNS ; i++)
-       {
-          mname = new SMRental(startTime,endTime,vanCapacity,numVans,numRentalAgents,sds[i]);
+       for(i=0 ; i < NUMRUNS ; i++) {
+          mname = new SMRental(startTime,endTime,capacity,numVans,numRentalAgents,sds[i]);
           mname.runSimulation();
        }
    }

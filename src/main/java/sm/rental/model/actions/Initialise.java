@@ -1,10 +1,11 @@
 package sm.rental.model.actions;
 
-import simulationModelling.*;
 import simulationModelling.ScheduledAction;
 import sm.rental.model.SMRental;
+import sm.rental.model.entities.Customer;
 import sm.rental.model.entities.Van;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Initialise extends ScheduledAction
 {
@@ -15,22 +16,14 @@ public class Initialise extends ScheduledAction
 
 	double [] ts = { 0.0, -1.0 }; // -1.0 ends scheduling
 	int tsix = 0;  // set index to first entry.
-	protected double timeSequence() 
-	{
+	public double timeSequence() {
 		return ts[tsix++];  // only invoked at t=0
 	}
 
-	protected void actionEvent() 
-	{
-		model.getRentalLine().clear();
-		model.getReturnLine().clear();
-		model.getTerminal1().clear();
-		model.getTerminal2().clear();
-
+	public void actionEvent() {
 		ArrayList<Van> vans = model.getRgVans();
 		int numVans = model.getNumVans();
-		int vanCapacity = model.getVanCapacity();
-		vans.clear();
+		int vanCapacity = model.getNumSeats();
 		for(int i=0; i<numVans; i++) vans.add(new Van(vanCapacity));
 	}
 }
