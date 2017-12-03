@@ -15,8 +15,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class Travel extends ConditionalActivity {
     @NonNull private final SMRental model;
-    private Van rgVan;
-    private VanLocation nextDestination;
+    private Van van = null;
+    private VanLocation nextDestination = null;
 
     public static boolean precondition(SMRental model){
         return canUnloadVan(model);
@@ -26,21 +26,21 @@ public class Travel extends ConditionalActivity {
         Optional<Van> possibleVan = getVanForTravel(model);
         if(!possibleVan.isPresent())
             throw new RuntimeException("Event Started but precondition must've been false: No van present");
-        rgVan = possibleVan.get();
-        nextDestination = getNextDestinationForVan(rgVan);
-        UDPs.UpdateVanStatus(rgVan, VanStatus.TRAVELLING);
+        van = possibleVan.get();
+        nextDestination = getNextDestinationForVan(van);
+        UDPs.UpdateVanStatus(van, VanStatus.TRAVELLING);
     }
 
     public double duration(){
-        return DVPs.travelTime(rgVan.getLocation(), nextDestination);
+        return DVPs.travelTime(van.getLocation(), nextDestination);
     }
 
     public void terminatingEvent(){
-        updateVanLocation(rgVan, nextDestination);
+        updateVanLocation(van, nextDestination);
         if( nextDestination == VanLocation.RENTAL_COUNTER || nextDestination == VanLocation.DROP_OFF){
-            if( rgVan.getSeatsAvailable() < rgVan.getCapacity())
-                UDPs.UpdateVanStatus(rgVan, VanStatus.UNLOADING);
-        } else UDPs.UpdateVanStatus(rgVan, VanStatus.LOADING);
+            if( van.getSeatsAvailable() < van.getCapacity())
+                UDPs.UpdateVanStatus(van, VanStatus.UNLOADING);
+        } else UDPs.UpdateVanStatus(van, VanStatus.LOADING);
     }
 
     //Local User Defined Procedures
@@ -73,6 +73,7 @@ public class Travel extends ConditionalActivity {
     }
 
     private static void updateVanLocation(Van van, VanLocation destination){
+        van.addMileage(UDPs.GetDistanceTravelled(van.getLocation(), destination));
         van.setLocation(destination);
     }
 

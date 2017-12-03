@@ -14,10 +14,10 @@ import sm.rental.model.procedures.UDPs;
 import java.util.Optional;
 
 @RequiredArgsConstructor
-public class ExitVan extends ConditionalActivity{
+public class ExitVan extends ConditionalActivity {
     @NonNull private final SMRental model;
     private Van van = null;
-    private Customer icgCustomer = null;
+    private Customer customer = null;
 
     public static boolean precondition(SMRental model){
        return canUnloadVan(model);
@@ -31,12 +31,12 @@ public class ExitVan extends ConditionalActivity{
         Optional<Customer> possibleCustomer = van.removeNextCustomer();
         if(!possibleCustomer.isPresent())
             throw new RuntimeException("Event Started but precondition must've been false: No customer present");
-        icgCustomer = possibleCustomer.get();
+        customer = possibleCustomer.get();
         UDPs.UpdateVanStatus(van, VanStatus.EXITING);
     }
 
     public double duration() {
-        return model.getRvp().uExitingTime(icgCustomer.getNumPassengers());
+        return model.getRvp().uExitingTime(customer.getNumPassengers());
     }
 
     public void terminatingEvent(){
@@ -45,10 +45,10 @@ public class ExitVan extends ConditionalActivity{
         } else {
             UDPs.UpdateVanStatus(van, VanStatus.UNLOADING);
         }
-        if(icgCustomer.getUType() == CustomerType.NEW){
-            model.getQRentalLine().offerLast(icgCustomer);
+        if(customer.getUType() == CustomerType.NEW){
+            model.getQRentalLine().offerLast(customer);
         } else {
-            UDPs.HandleCustomerExit(icgCustomer);
+            UDPs.HandleCustomerExit(customer);
         }
     }
 

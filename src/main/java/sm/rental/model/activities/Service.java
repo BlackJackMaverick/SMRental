@@ -1,42 +1,42 @@
 package sm.rental.model.activities;
 
-import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import simulationModelling.ConditionalActivity;
 import sm.rental.model.SMRental;
 import sm.rental.model.entities.Customer;
 import sm.rental.model.entities.Customer.CustomerType;
 import sm.rental.model.entities.RentalCounter;
+import sm.rental.model.procedures.RVPs;
+import sm.rental.model.procedures.UDPs;
 
-import static sm.rental.model.procedures.UDPs.HandleCustomerExit;
+@RequiredArgsConstructor
+public class Service extends ConditionalActivity {
+    @NonNull private final SMRental model;
 
-public class Service extends ConditionalActivity{
-    @Getter private Customer icgCustomer = null;
-    @Getter private SMRental model;
-
-    public Service(SMRental model){
-        this.model = model;
-    }
+    private Customer customer = null;
 
     protected static boolean precondition(SMRental model){
-        return model.getQRentalLine().size() > 0 && isAgentAvailable(model.getRgRentalCounter());
+        return model.getQRentalLine().size() > 0
+                && isAgentAvailable(model.getRgRentalCounter());
     }
     public void startingEvent(){
         occupyAgent();
-        icgCustomer = model.getQRentalLine().pop(); // Remove customer
+        customer = model.getQRentalLine().pop(); // Remove customer
     }
 
     public double duration(){
-        return model.getRvp().uServiceTime(icgCustomer.getUType());
+        return RVPs.uServiceTime(customer.getUType());
     }
 
     public void terminatingEvent(){
         freeAgent();
-        if(icgCustomer.getUType() == CustomerType.NEW){
-            HandleCustomerExit(icgCustomer);
+        if(customer.getUType() == CustomerType.NEW){
+            UDPs.HandleCustomerExit(customer);
         } else {
-            model.getQReturnLine().offerLast(icgCustomer);
+            model.getQReturnLine().offerLast(customer);
         }
-        icgCustomer = null;
+        customer = null;
     }
 
     //Local User Defined Procedures

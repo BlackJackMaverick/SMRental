@@ -17,8 +17,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class Board extends ConditionalActivity {
     @NonNull private final SMRental model;
-    private Customer customer;
-    private Van van;
+    private Customer customer = null;
+    private Van van = null;
 
     public static boolean precondition (SMRental model){
         return canCustomerBoardVan(model);

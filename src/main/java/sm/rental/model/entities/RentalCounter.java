@@ -9,7 +9,6 @@ import java.util.ArrayList;
 public class RentalCounter {
 
     @NonNull @Getter private Integer uNumAgents; //The number of available agents.
-    @Getter private ArrayList<Customer> group = new ArrayList<Customer>();
 
     public void addAgent(){
         uNumAgents++;
