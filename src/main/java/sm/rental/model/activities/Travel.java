@@ -11,6 +11,9 @@ import sm.rental.model.procedures.DVPs;
 import sm.rental.model.procedures.UDPs;
 
 import java.util.Optional;
+import java.util.function.Function;
+
+import static java.util.stream.Collectors.toList;
 
 @RequiredArgsConstructor
 public class Travel extends ConditionalActivity {
@@ -19,7 +22,7 @@ public class Travel extends ConditionalActivity {
     private VanLocation nextDestination = null;
 
     public static boolean precondition(SMRental model){
-        return canUnloadVan(model);
+        return getVanForTravel(model).isPresent();
     }
 
     public void startingEvent() {
@@ -32,7 +35,7 @@ public class Travel extends ConditionalActivity {
     }
 
     public double duration(){
-        return DVPs.travelTime(van.getLocation(), nextDestination);
+        return model.getClock() + DVPs.travelTime(van.getLocation(), nextDestination);
     }
 
     public void terminatingEvent(){
@@ -44,32 +47,38 @@ public class Travel extends ConditionalActivity {
     }
 
     //Local User Defined Procedures
-    private static boolean canUnloadVan(SMRental model){
-        return model.getRgVans().stream()
-                .anyMatch(van -> van.getStatus() == VanStatus.UNLOADING && van.getN() > 0);
+    private static boolean canUnloadVan(Van van){
+        return van.getStatus() == VanStatus.UNLOADING && van.getN() > 0;
     }
 
     private static Optional<Van> getVanForTravel(SMRental model){
         return model.getRgVans().stream()
-                .filter(van -> van.getStatus() == VanStatus.UNLOADING && van.getN() > 0)
+                .filter( v ->!UDPs.CanCustomerBoard(model, v) && !canUnloadVan(v) && v.getStatus() != VanStatus.TRAVELLING)
                 .findFirst();
     }
 
     private static VanLocation getNextDestinationForVan(Van van){
+        VanLocation newLocation = null;
         switch (van.getLocation()){
             case TERMINAL1:
-                return VanLocation.TERMINAL2;
+                newLocation = VanLocation.TERMINAL2;
+                break;
             case TERMINAL2:
-                return VanLocation.RENTAL_COUNTER;
+                newLocation = VanLocation.RENTAL_COUNTER;
+                break;
             case RENTAL_COUNTER:
                 if(van.getN() > 0)
-                    return VanLocation.DROP_OFF;
+                    newLocation = VanLocation.DROP_OFF;
                 else
-                    return VanLocation.TERMINAL1;
+                    newLocation = VanLocation.TERMINAL1;
+                break;
             case DROP_OFF:
-                return VanLocation.TERMINAL1;
+                newLocation = VanLocation.TERMINAL1;
+                break;
+            default:
+                throw new IllegalStateException("Van Location doesn't exist");
         }
-        throw new IllegalStateException("Van Location doesn't exist");
+        return newLocation;
     }
 
     private static void updateVanLocation(Van van, VanLocation destination){
@@ -77,4 +86,11 @@ public class Travel extends ConditionalActivity {
         van.setLocation(destination);
     }
 
+    // Predicate
+    public static final Function<SMRental,Optional<ConditionalActivity>> function = (SMRental model) -> {
+        if(Travel.precondition(model)){
+            return Optional.of(new Travel(model));
+        }
+        else return Optional.empty();
+    };
 }

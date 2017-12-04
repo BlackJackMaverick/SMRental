@@ -9,7 +9,7 @@ import sm.rental.model.entities.Customer.CustomerType;
 import sm.rental.model.procedures.RVPs;
 
 @RequiredArgsConstructor
-public class NewArrivalT2 extends ScheduledAction{
+public class NewArrivalT2 extends ScheduledAction {
     @NonNull private final SMRental model;
 
     public double timeSequence(){

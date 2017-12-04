@@ -5,10 +5,11 @@ import sm.rental.model.entities.Customer;
 import sm.rental.model.entities.Van;
 import sm.rental.model.entities.Van.*;
 
+import java.util.LinkedList;
+import java.util.Optional;
+
 import static sm.rental.model.Constants.ACCEPTABLE_N_TURNARROUNDT;
 import static sm.rental.model.Constants.ACCEPTABLE_R_TURNARROUNDT;
-import static sm.rental.model.entities.Van.VanLocation.TERMINAL1;
-import static sm.rental.model.entities.Van.VanLocation.TERMINAL2;
 
 public class UDPs {
 	private static SMRental model;
@@ -50,5 +51,34 @@ public class UDPs {
                 return DISTANCE_RC_DP;
         }
         throw new IllegalStateException("Destination doesn't exist");
+    }
+    public static boolean CanCustomerBoardVan(SMRental model){
+        Optional<Van> possibleVan = GetVanForBoarding(model);
+        return possibleVan.isPresent() &&
+                CanCustomerBoard(model, possibleVan.get());
+    }
+    public static boolean CanCustomerExitVan(SMRental model){
+        Optional<Van> possibleVan = GetVanForBoarding(model);
+        return possibleVan.isPresent() &&
+                CanCustomerBoard(model, possibleVan.get());
+    }
+
+    public static Optional<Van> GetVanForBoarding(SMRental model){
+        return model.getRgVans().stream()
+                .filter(van -> van.getStatus() == VanStatus.LOADING)
+                .findFirst();
+    }
+    public static boolean CanCustomerBoard(SMRental model, Van van) {
+        Optional<LinkedList<Customer>> queue = GetLocationForBoarding(model, van);
+        return queue.isPresent() &&
+                queue.get().stream()
+                        .anyMatch(customer -> customer.getNumPassengers() <= van.getSeatsAvailable());
+    }
+
+    public static Optional<LinkedList<Customer>> GetLocationForBoarding(SMRental model, Van van){
+        if(van.getLocation() == VanLocation.TERMINAL1) return Optional.of(model.getQTerminals().get(0));
+        else if(van.getLocation() == VanLocation.TERMINAL2) return Optional.of(model.getQTerminals().get(1));
+        else if(van.getLocation() == VanLocation.RENTAL_COUNTER) return Optional.of(model.getQReturnLine());
+        else return Optional.empty();
     }
 }

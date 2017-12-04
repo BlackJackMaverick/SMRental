@@ -4,6 +4,7 @@ import cern.jet.random.Exponential;
 import cern.jet.random.engine.MersenneTwister;
 import cern.jet.random.Uniform;
 import sm.rental.model.entities.Customer;
+import sm.rental.model.entities.Customer.CustomerType;
 import sm.rental.model.SMRental;
 import sm.rental.model.Seeds;
 
@@ -47,59 +48,61 @@ public class RVPs
 	public static void ConfigureRVPs(SMRental smRental, Seeds sd) {
 		model = smRental;
 		// Set up distribution functions
-		NCustomerT1 = new Exponential(
-				1.0/T1Means[0],
-				new MersenneTwister(sd.getNewCustomerSeedT1()));
+		NCustomerT1 = new Exponential(1.0/T1Means[0], new MersenneTwister(sd.getNewCustomerSeedT1()));
 
-		NCustomerT2 = new Exponential(
-				1.0/T2Means[0],
-				new MersenneTwister(sd.getNewCustomerSeedT2()));
+		NCustomerT2 = new Exponential(1.0/T2Means[0], new MersenneTwister(sd.getNewCustomerSeedT2()));
 
 		RCustomer = new Exponential(1.0/RCMeans[0], new MersenneTwister(sd.getReturningCustomerSeed()));
+
 		RCServiceTime = new Uniform(CIMax, CIMin, sd.getReturningCustomerServiceTimeSeed());
 		NCServiceTime = new Uniform(COMax, COMin, sd.getNewCustomerServiceTimeSeed());
+
 		AdditionalPassengers = new MersenneTwister(sd.getAdditionalPassengerSeed());
+
 		BoardingTime = new Exponential(1.0/ avgBoardingTime, new MersenneTwister(sd.getBoardingTimeSeed()));
 		ExitingTime = new Exponential(1.0/ avgExitTime, new MersenneTwister(sd.getExitTimeSeed()));
 	}
 
 	public static double DuNCustomerT1(){
-		double nextCustomer;
-		double t = model.getClock();
-		double mean = getMean(T1Means, t);
-		nextCustomer = t + NCustomerT1.nextDouble(1.0/mean);
-		//missing if statement to determine if past closing time of the system, missing parameter
-		return nextCustomer;
+        double nextCustomer;
+        double t = model.getClock();
+        double mean = getMean(T1Means, t);
+        nextCustomer = t + NCustomerT1.nextDouble(1.0/mean);
+        //missing if statement to determine if past closing time of the system, missing parameter
+        if(nextCustomer > model.getEndTime())
+            nextCustomer = -1.0;  // Ends time sequence
+        return nextCustomer;
 	}
 
 	public static double DuNCustomerT2(){
-		double nextCustomer;
-		double t = model.getClock();
-		double mean = getMean(T2Means, t);
-		nextCustomer = t + NCustomerT2.nextDouble(1.0/mean);
-		//missing if statement to determine if past closing time of the system, missing parameter
-		return nextCustomer;
+        double nextCustomer;
+        double t = model.getClock();
+        double mean = getMean(T1Means, t);
+        nextCustomer = t+ NCustomerT2.nextDouble(1.0/mean);
+        //missing if statement to determine if past closing time of the system, missing parameter
+        if(nextCustomer > model.getEndTime())
+            nextCustomer = -1.0;  // Ends time sequence
+        return nextCustomer;
 	}
 
 	public static double DuRCustomer(){
 		double nextCustomer;
-		double t = model.getClock();
+        double t = model.getClock();
 		double mean = getMean(RCMeans, t);
-		nextCustomer = t + RCustomer.nextDouble(1.0/mean);
+		nextCustomer = t+ RCustomer.nextDouble(1.0/mean);
 		//missing if statement to determine if past closing time of the system, missing parameter
+        if(nextCustomer > model.getEndTime())
+            nextCustomer = -1.0;  // Ends time sequence
 		return nextCustomer;
 	}
 
 	//Check in time is associated with returning customers
-	//Check out time is associated with newe customers
-	public static double uServiceTime(Customer.CustomerType uType){
-		double serviceTime = 0;
-		if(uType == Customer.CustomerType.RETURNING){
-			serviceTime = RCServiceTime.nextDouble();
-		} else if(uType == Customer.CustomerType.NEW){
-			serviceTime = NCServiceTime.nextDouble();
+	//Check out time is associated with new customers
+	public static double uServiceTime(CustomerType uType){
+		if(uType == CustomerType.RETURNING){
+			return RCServiceTime.nextDouble();
 		}
-		return serviceTime;
+        return NCServiceTime.nextDouble();
 	}
 
 	public static int uNumPassengers(){
@@ -115,14 +118,14 @@ public class RVPs
 		}
 	}
 
-	public double uBoardingTime(int numPassengers){
+	public static double uBoardingTime(int numPassengers){
 		double boardingTime = 0;
 		for(int i = 0; i < numPassengers; i++)
 			boardingTime += BoardingTime.nextDouble();
 		return boardingTime/60;
 	}
 
-	public double uExitingTime(int numPassengers){
+	public static double uExitingTime(int numPassengers){
 		double exitTime = 0;
 		for(int i = 0; i < numPassengers; i++)
 			exitTime += ExitingTime.nextDouble();

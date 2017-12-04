@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Optional;
 
-@Data
 @RequiredArgsConstructor
 public class Van {
     public enum VanStatus {
@@ -23,20 +22,24 @@ public class Van {
         DROP_OFF,
         RENTAL_COUNTER
     }
-    @Getter private VanStatus status;
-    @Getter private VanLocation location;
-    private LinkedList<Customer> group;
+    @NonNull @Getter @Setter private VanStatus status;
+    @NonNull @Getter @Setter private VanLocation location;
+    private LinkedList<Customer> group = new LinkedList<>();
     @Getter private int capacity; //Maximum number of seats in the van.
     @Getter private double mileage; //Total number of miles driven by the van in the observation interval
-    @NonNull @Getter private final Integer seatsAvailable; //Number of available seats in the van
+    @NonNull @Getter private Integer seatsAvailable; //Number of available seats in the van
 
     // Required methods to manipulate the group
     public void addCustomer(Customer customer) {
         group.offerLast(customer);
+        seatsAvailable -= customer.getNumPassengers();
     }
 
     public Optional<Customer> removeNextCustomer() {
-        return Optional.ofNullable(group.pop());
+        Optional<Customer> possibleCustomer = Optional.ofNullable(group.pop());
+        if(possibleCustomer.isPresent())
+            seatsAvailable += possibleCustomer.get().getNumPassengers();
+        return possibleCustomer;
     }
 
     public int getN() {
