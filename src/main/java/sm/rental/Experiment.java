@@ -5,30 +5,223 @@ package sm.rental;
 import sm.rental.model.*;
 import cern.jet.random.engine.*;
 
+import java.util.*;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.reducing;
+import static java.util.stream.Collectors.toList;
+
 // Main Method: Experiments
-// 
+
 class Experiment
 {
-   public static void main(String[] args)
-   {
-       int i, NUMRUNS = 1;
-       double startTime=0.0, endTime=660.0;
-       Seeds[] sds = new Seeds[NUMRUNS];
-       SMRental mname;  // Simulation object
-       int capacity = 12;
-       int numVans = 3;
-       int numRentalAgents = 99;
 
-       // Lets get a set of uncorrelated seeds
-       RandomSeedGenerator rsg = new RandomSeedGenerator();
-       for(i=0 ; i<NUMRUNS ; i++) sds[i] = new Seeds(rsg);
-       
-       // Loop for NUMRUN simulation runs for each case
-       // Case 1
-       System.out.println(" Case 1");
-       for(i=0 ; i < NUMRUNS ; i++) {
-          mname = new SMRental(startTime,endTime,capacity,numVans,numRentalAgents,sds[i]);
-          mname.runSimulation();
-       }
-   }
+    private static String RESULT_LIST_FORMAT =
+            "Result Summary for capacity %d { Avg cost: %.2f, Avg Satisfaction: %.2f Number of Vans: %d, Number of Agents: %d }%n";
+    private static int MAX_RENTAL_AGENTS = 99;
+    private static int MAX_VANS = 99;
+
+    public static void main(String[] args)
+    {
+        int NUMRUNS = 1000;
+        double startTime = 0.0, endTime = 270.0;
+
+
+        // Lets get a set of uncorrelated seeds
+        RandomSeedGenerator rsg = new RandomSeedGenerator();
+        ArrayList<Seeds> seeds = new ArrayList<>();
+        IntStream.range(0, NUMRUNS)
+                .forEach(i->seeds.add(new Seeds(rsg)));
+
+        List<List<Result>> caseOneResultsBase = caseOne(NUMRUNS, startTime, endTime, seeds, false);
+
+        /**
+         * BASE EXPERIMENTS
+         * SEARCHING FOR A 85% SATISFACTION RATE
+         */
+        System.out.println(" Case 1 - Base");
+        caseOneResultsBase.forEach(Experiment::printResultList);
+        System.out.println(">-----------------------------------------------<");
+
+        List<List<Result>> caseTwoResultsBase = caseTwo(caseOneResultsBase, NUMRUNS, startTime,
+                                                        endTime, seeds, false);
+
+
+        System.out.println(" Case 2 - Base");
+        caseTwoResultsBase.forEach(Experiment::printResultList);
+        System.out.println(">-----------------------------------------------<");
+
+        List<List<Result>> caseThreeResultsBase = caseTwoResultsBase.stream()
+                .map(r -> caseThree(r, NUMRUNS, startTime, endTime, seeds, false))
+                .collect(toList());
+
+        System.out.println(" Case 3 - Base");
+        caseThreeResultsBase.forEach(Experiment::printResultList);
+        System.out.println(">-----------------------------------------------<");
+
+        List<List<Result>> caseOneResultsImproved = caseOne(NUMRUNS, startTime, endTime, seeds, true);
+
+        /**
+         * IMPROVED EXPERIMENTS
+         * SEARCHING FOR A 90% SATISFACTION RATE
+         */
+        System.out.println(" Case 1 - Improved");
+        caseOneResultsImproved.forEach(Experiment::printResultList);
+        System.out.println(">-----------------------------------------------<");
+
+        List<List<Result>> caseTwoResultsImproved = caseTwo(caseOneResultsImproved, NUMRUNS, startTime,
+                                                            endTime, seeds, true);
+
+        System.out.println(" Case 2 - Improved");
+        caseTwoResultsImproved.forEach(Experiment::printResultList);
+        System.out.println(">-----------------------------------------------<");
+
+        List<List<Result>> caseThreeResultsImproved = caseTwoResultsImproved.stream()
+                .map(r -> caseThree(r, NUMRUNS, startTime, endTime, seeds, true))
+                .collect(toList());
+
+
+        System.out.println(" Case 3 - Improved");
+        caseThreeResultsImproved.forEach(Experiment::printResultList);
+        System.out.println(">-----------------------------------------------<");
+    }
+
+    /**
+     * Searches for the minimum amount of vans to satisfy the customer satisfaction rate
+     * Does so by Iterating on possible configurations between 1 and NUMRUNs for each capacity.
+     *  It will run NUMRUN simulations with a different seed
+     */
+
+    public static List<List<Result>> caseOne(int NUMRUNS,
+                                             double startTime,
+                                             double endTime,
+                                             ArrayList<Seeds> seeds,
+                                             boolean improved){
+        return IntStream.of(12, 18, 30)
+                .mapToObj(capacity -> IntStream.range(1, MAX_VANS) // Stream that defines the number of vans
+                        .sequential() // Ensures that the first result to meet base requirements will be the smallest van count
+                        .mapToObj(vans -> IntStream.range(0, NUMRUNS)
+                                .mapToObj(run -> RunSimulation(startTime, endTime, capacity,
+                                                               vans, MAX_RENTAL_AGENTS, seeds.get(run)))
+                                .collect(toList()))
+                        .filter(resultList -> resultListMeetsRequirements(resultList, improved)) // Verify that each simulation met the requirements
+                        .findFirst()) // Return the first configuration that satisfies this, since it is sequential, it will be the mininmum van configuration
+                .map(Optional::get) //Removes the optional type encapsulation returned by findfirst
+                .collect(toList());
+    }
+
+
+    /**
+     * For each result, that represents a minimal van configuration
+     * Test configurations between 0 - NUMRUNS of rental agents
+     * Choose the configuration with least amount of rental agents
+     */
+
+
+    public static List<List<Result>> caseTwo(List<List<Result>> caseOneResults,
+                                             int NUMRUNS,
+                                             double startTime,
+                                             double endTime,
+                                             List<Seeds> seeds,
+                                             boolean improved){
+        return caseOneResults.stream()
+                .map(minVanResult -> IntStream.range(1, MAX_RENTAL_AGENTS)
+                        .sequential()
+                        .mapToObj(rentalAgents -> IntStream.range(0, NUMRUNS)
+                                .sequential()
+                                .mapToObj(run -> RunSimulation(startTime, endTime, minVanResult.get(0).getCapacity(),
+                                                               minVanResult.get(0).getNumVans(), rentalAgents,
+                                                               seeds.get(run)))
+                                .collect(toList()))
+                        .filter(resultList -> resultListMeetsRequirements(resultList, improved)) // Verify that each simulation met the base requirements
+                        .findFirst()) // Return the first configuration that satisfies this, since it is sequential, it will be the mininmum van configuration
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(toList());
+    }
+
+    /**
+     * Attempts to find a better solution for each van configuration
+     * Returns the best found. If the original is the best, it will be returned.
+     */
+
+    public static List<Result> caseThree(List<Result> rl,
+                                         int NUMRUNS,
+                                         double startTime,
+                                         double endTime,
+                                         ArrayList<Seeds> seeds,
+                                         boolean improved){
+        List<Result> best = rl;
+        do {
+            Optional<List<Result>> attempt = Stream.of(best)
+                    .map(res -> IntStream.range(0, res.get(0).getNumRentalAgents())
+                            .sequential()
+                            .mapToObj(rentalAgents -> IntStream.range(0, NUMRUNS)
+                                    .mapToObj(run -> RunSimulation(startTime, endTime, res.get(0).getCapacity(),
+                                                                   res.get(0).getNumVans() + 1, rentalAgents,
+                                                                   seeds.get(run)))
+                                    .collect(toList()))
+                            .filter(resultList -> resultListMeetsRequirements(resultList, improved))
+                            .min(Experiment::resultListsCompareAvg))
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .findFirst();
+            if(!attempt.isPresent())
+                return best;
+
+            List<Result> challenger = attempt.get();
+            if( 0>= resultListsCompareAvg(challenger, best)) {
+                best = attempt.get();
+            } else return best;
+        }while(true);
+    }
+
+    public static int resultListsCompareAvg(List<Result> rl1, List<Result> rl2){
+        return Double.compare(rl1.stream()
+                                      .mapToDouble(Result::getOverAllCost)
+                                      .average().orElse(0.0),
+                              rl2.stream()
+                                      .mapToDouble(Result::getOverAllCost)
+                                      .average().orElse(0.0));
+    }
+
+    public static double resultListsAvgCost(List<Result> rl1){
+        return rl1.stream()
+                .mapToDouble(Result::getOverAllCost)
+                .average().orElse(0.0);
+    }
+    public static double resultListsAvgSatisfaction(List<Result> rl1){
+        return rl1.stream()
+                .mapToDouble(Result::getSatisfactionRate)
+                .average().orElse(0.0);
+    }
+
+    public static boolean resultListMeetsRequirements(List<Result> resultList, boolean improved){
+        return resultList.stream()
+                .mapToDouble(Result::getSatisfactionRate)
+                .average().orElse(0.0) >= ((improved)?
+                Constants.TARGET_SATISFACTION_RATE_IMPROVED :
+                Constants.TARGET_SATISFACTION_RATE_BASE);
+    }
+
+    public static void printResultList(List<Result> lst){
+        System.out.format(RESULT_LIST_FORMAT,
+                          lst.get(0).getCapacity(),
+                          resultListsAvgCost(lst),
+                          resultListsAvgSatisfaction(lst),
+                          lst.get(0).getNumVans(),
+                          lst.get(0).getNumRentalAgents());
+    }
+
+    public static Result RunSimulation( double startTime,
+                                        double endTime,
+                                        int capacity,
+                                        int numVans,
+                                        int numRentalAgents,
+                                        Seeds sds) {
+        SMRental sm = new SMRental(startTime, endTime, capacity, numVans, numRentalAgents, sds);
+        sm.runSimulation();
+        return new Result(sm, sm.getSsovs(), sm.getDsovs());
+    }
 }

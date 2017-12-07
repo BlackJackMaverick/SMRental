@@ -1,17 +1,12 @@
 package sm.rental.model;
 
 import java.util.*;
-import java.util.function.BiPredicate;
-import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import lombok.Getter;
 import simulationModelling.AOSimulationModel;
 import simulationModelling.Behaviour;
 import simulationModelling.ConditionalActivity;
-import simulationModelling.SequelActivity;
 import sm.rental.model.actions.NewArrivalT1;
 import sm.rental.model.actions.NewArrivalT2;
 import sm.rental.model.actions.ReturningArrival;
@@ -24,13 +19,11 @@ import sm.rental.model.entities.RentalCounter;
 import sm.rental.model.entities.Van;
 import sm.rental.model.outputs.DSOV;
 import sm.rental.model.outputs.SSOV;
-import sm.rental.model.procedures.DVPs;
 import sm.rental.model.procedures.RVPs;
 import sm.rental.model.actions.Initialise;
 import sm.rental.model.procedures.UDPs;
 
 import static java.util.stream.Collectors.toList;
-
 
 //
 // The Simulation model Class
@@ -46,12 +39,22 @@ public class SMRental extends AOSimulationModel
 	/* Group and Queue entities */
 	// Define the reference variables to the various 
 	// entities with scope Set and Unary
-	@Getter private ArrayList<Van> rgVans;
-	@Getter private RentalCounter rgRentalCounter;
+	@Getter private ArrayList<Van> vans;
+	@Getter private RentalCounter rentalCounter;
 
-	@Getter private ArrayList<LinkedList<Customer>> qTerminals;
-	@Getter private LinkedList<Customer> qReturnLine;
-	@Getter private LinkedList<Customer> qRentalLine;
+	@Getter private ArrayList<LinkedList<Customer>> terminals;
+
+    public LinkedList<Customer> getReturnLine() {
+        return returnLine;
+    }
+
+    private LinkedList<Customer> returnLine;
+
+    public LinkedList<Customer> getRentalLine() {
+        return rentalLine;
+    }
+
+    private LinkedList<Customer> rentalLine;
 
 	// Objects can be created here or in the Initialise Action
     private List<Function<SMRental,Optional<ConditionalActivity>>> preconditions;
@@ -69,9 +72,19 @@ public class SMRental extends AOSimulationModel
         UDPs.ConfigureUDPs(this);
         RVPs.ConfigureRVPs(this, sd);
 
+        // Configure Van cost
+        double perMileCost;
+        if(numSeats == 12) {
+            perMileCost = Constants.VAN12_COST;
+        } else if(numSeats == 18) {
+            perMileCost = Constants.VAN18_COST;
+        } else {
+            perMileCost = Constants.VAN30_COST;
+        }
+
         // Setup outputs
         ssovs = new SSOV(this);
-        dsovs = new DSOV(this);
+        dsovs = new DSOV(this, perMileCost);
 
         // Initialise parameters here
 		this.numSeats = numSeats;
@@ -79,14 +92,15 @@ public class SMRental extends AOSimulationModel
 		this.numRentalAgents = numRentalAgents;
 
 		// Create Structural Entities Corresponding to Resources
-        qTerminals = new ArrayList<>();
-        qTerminals.add(new LinkedList<>());
-        qTerminals.add(new LinkedList<>());
 
-        qReturnLine = new LinkedList<>();
-        qRentalLine = new LinkedList<>();
-        rgRentalCounter = new RentalCounter(numRentalAgents);
-        rgVans = new ArrayList<>();
+        terminals = new ArrayList<>();
+        terminals.add(new LinkedList<>());
+        terminals.add(new LinkedList<>());
+
+        returnLine = new LinkedList<>();
+        rentalLine = new LinkedList<>();
+        rentalCounter = new RentalCounter(numRentalAgents);
+        vans = new ArrayList<>();
 
         // Setup preconditions
         preconditions = new LinkedList<>();
@@ -119,53 +133,49 @@ public class SMRental extends AOSimulationModel
 	 */
 
     @Override
-    public void testPreconditions(Behaviour behObj)
-    {
+    public void testPreconditions(Behaviour behObj) {
         reschedule(behObj);
         while(scanPreconditions());
     }
 
     // Single scan of all preconditions
     // Returns true if at least one precondition was true.
-    private boolean scanPreconditions()
-    {
+    private boolean scanPreconditions() {
         List<ConditionalActivity> possibleActivities = preconditions.stream()
                 .map(e -> e.apply(this))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .collect(Collectors.toList());
+                .collect(toList());
         if(possibleActivities.isEmpty()) return false;
         possibleActivities.forEach(act -> {
-                    act.startingEvent();
-                    scheduleActivity(act);});
+            act.startingEvent();
+            scheduleActivity(act);
+        });
         return true;
     }
 
-    public void eventOccured()
-    {
+    public void eventOccured() {
         if(logFlag) printDebug();
     }
 
     // for Debugging
     boolean logFlag = true;
-    private void printDebug()
-    {
+    private void printDebug() {
+        if (logFlag)
+            return;
         // Debugging
         System.out.println(">-----------------------------------------------<");
-        StringBuilder vanstringsBuilder = new StringBuilder("[");
-        for(int i = 0; i< rgVans.size(); i++)
-            vanstringsBuilder.append("( id:").append(i).append(", status:").append(rgVans.get(i).getStatus()).append(
-                    ", seatsAvailable:").append(rgVans.get(i).getSeatsAvailable()).append(", location:").append(
-                    rgVans.get(i).getLocation()).append(") \n");
-        String vanstrings = vanstringsBuilder.toString();
-        vanstrings += "]";
-        System.out.println("Clock:" + getClock() + "Q.Terminal1.n:" + qTerminals.get(0).size()+
-                                   " Q.Terminal2.n:" + qTerminals.get(1).size() +" Q.RentalLine.n: "+qRentalLine.size()+
-                "Q.ReturnLine.n:" + qReturnLine.size() +"RG.Vans:" + vanstrings);
 
+        System.out.println("Clock:" + getClock() + "Q.Terminal1.n:" + terminals.get(0).size()+
+                                   " Q.Terminal2.n:" + terminals.get(1).size() +" Q.RentalLine.n: "+ rentalLine.size()+
+                "Q.ReturnLine.n:" + returnLine.size() +"RG.Vans:" );
+
+        StringBuilder vanstringsBuilder = new StringBuilder("[");
+        vans.forEach(v -> vanstringsBuilder.append(v.toString()).append("\n"));
+        String vanstrings = vanstringsBuilder.append("]").toString();
+        System.out.println(vanstrings);
+        System.out.println(ssovs.toString() +"\n" +dsovs.toString());
         //showSBL();
         System.out.println(">-----------------------------------------------<");
     }
-
-	// Standard Procedure to start Sequel activities with no parameters
 }

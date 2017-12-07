@@ -2,9 +2,11 @@ package  sm.rental.model.entities;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 import java.util.ArrayList;
 
+@ToString
 @RequiredArgsConstructor
 public class RentalCounter {
 

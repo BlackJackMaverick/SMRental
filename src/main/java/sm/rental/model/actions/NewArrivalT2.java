@@ -11,13 +11,12 @@ import sm.rental.model.procedures.RVPs;
 @RequiredArgsConstructor
 public class NewArrivalT2 extends ScheduledAction {
     @NonNull private final SMRental model;
-
     public double timeSequence(){
         return RVPs.DuNCustomerT2();
     }
 
     public void actionEvent(){
         Customer customer = new Customer( model.getClock(), CustomerType.NEW, RVPs.uNumPassengers() + 1);
-        model.getQTerminals().get(1).add(customer);
+        model.getTerminals().get(1).add(customer);
     }
 }

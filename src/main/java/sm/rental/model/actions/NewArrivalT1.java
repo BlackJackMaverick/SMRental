@@ -18,6 +18,6 @@ public class NewArrivalT1 extends ScheduledAction {
 
     public void actionEvent(){
         Customer customer = new Customer(model.getClock(), CustomerType.NEW, RVPs.uNumPassengers() + 1);
-        model.getQTerminals().get(0).add(customer);
+        model.getTerminals().get(0).add(customer);
     }
 }

@@ -14,7 +14,6 @@ import sm.rental.model.procedures.UDPs;
 
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 @RequiredArgsConstructor
 public class ExitVan extends ConditionalActivity {
@@ -24,7 +23,7 @@ public class ExitVan extends ConditionalActivity {
     private Customer customer = null;
 
     public static boolean precondition(SMRental model) {
-        return canUnloadVan(model);
+        return getVanForUnloading(model).isPresent();
     }
 
     public void startingEvent() {
@@ -34,7 +33,7 @@ public class ExitVan extends ConditionalActivity {
         van = possibleVan.get();
         Optional<Customer> possibleCustomer = van.removeNextCustomer();
         if (! possibleCustomer.isPresent())
-            throw new RuntimeException("Event Started but precondition must've been false: No customer present");
+            throw new RuntimeException("Event Started but precondition must've been false: No customer present in van");
         customer = possibleCustomer.get();
         UDPs.UpdateVanStatus(van, VanStatus.EXITING);
     }
@@ -44,25 +43,27 @@ public class ExitVan extends ConditionalActivity {
     }
 
     public void terminatingEvent() {
-        if (van.getSeatsAvailable() == van.getCapacity()) {
+        if (van.getSeatsAvailable() == van.getCapacity())
             UDPs.UpdateVanStatus(van, VanStatus.LOADING);
-        } else {
+        else
             UDPs.UpdateVanStatus(van, VanStatus.UNLOADING);
-        }
-        if (customer.getUType() == CustomerType.NEW) {
-            model.getQRentalLine().offerLast(customer);
-        } else {
+        if (customer.getUType() == CustomerType.NEW)
+            model.getRentalLine().offerLast(customer);
+        else
             UDPs.HandleCustomerExit(customer);
-        }
     }
 
     // Local User Defined Procedures
-    private static boolean canUnloadVan(SMRental model) {
-        return model.getRgVans().stream().anyMatch(van -> van.getStatus() == VanStatus.UNLOADING && van.getN() > 0);
-    }
 
+    /**
+     * The van is located at rental counter or drop off point (Van.Location=RENTAL_COUNTER or DROP_OFF)
+     * The vans status is unloading
+     * The van is not empty
+     **/
     private static Optional<Van> getVanForUnloading(SMRental model) {
-        return model.getRgVans().stream().filter(van -> van.getStatus() == VanStatus.UNLOADING && van.getN() > 0).findFirst();
+        return model.getVans().stream()
+                .filter(van -> van.getStatus() == VanStatus.UNLOADING && van.getN() > 0)
+                .findFirst();
     }
 
     // Predicate

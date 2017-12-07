@@ -19,31 +19,29 @@ import java.util.function.Function;
 public class Service extends ConditionalActivity {
     @NonNull private final SMRental model;
 
-    private Customer customer = null;
+    private Customer customer;
 
-    public static boolean precondition(SMRental model){
-        return (model.getQRentalLine().size() > 0)
-                && isAgentAvailable(model.getRgRentalCounter());
+    public static boolean precondition(SMRental model) {
+        return (model.getRentalLine().size() > 0)
+                && isAgentAvailable(model.getRentalCounter());
     }
-    public void startingEvent(){
+    public void startingEvent() {
         occupyAgent();
-        System.out.println("pop"+model.getQRentalLine().size()+" c"+ ReturningArrival.count);
-        customer = model.getQRentalLine().pop(); // Remove customer
+        customer = model.getRentalLine().pop(); // Remove customer
         if(customer == null)
             throw new RuntimeException("Couldn't service");
     }
 
-    public double duration(){
+    public double duration() {
         return RVPs.uServiceTime(customer.getUType());
     }
 
-    public void terminatingEvent(){
+    public void terminatingEvent() {
         freeAgent();
-        if(customer.getUType() == CustomerType.NEW){
+        if(customer.getUType() == CustomerType.NEW)
             UDPs.HandleCustomerExit(customer);
-        } else {
-            model.getQReturnLine().offerLast(customer);
-        }
+        else
+            model.getReturnLine().offerLast(customer);
     }
 
     //Local User Defined Procedures
@@ -52,18 +50,18 @@ public class Service extends ConditionalActivity {
     }
 
     private void freeAgent(){
-        model.getRgRentalCounter().addAgent();
+        model.getRentalCounter().addAgent();
     }
 
     private void occupyAgent(){
-        model.getRgRentalCounter().removeAgent();
+        model.getRentalCounter().removeAgent();
     }
 
     // Predicate
-    public static final Function<SMRental,Optional<ConditionalActivity>> function = (SMRental model) -> {
-        if(Service.precondition(model)){
+
+    public static final Function<SMRental, Optional<ConditionalActivity>> function = (SMRental model) -> {
+        if(Service.precondition(model))
             return Optional.of(new Service(model));
-        }
         else return Optional.empty();
     };
 }

@@ -3,7 +3,6 @@ package sm.rental.model.procedures;
 import cern.jet.random.Exponential;
 import cern.jet.random.engine.MersenneTwister;
 import cern.jet.random.Uniform;
-import sm.rental.model.entities.Customer;
 import sm.rental.model.entities.Customer.CustomerType;
 import sm.rental.model.SMRental;
 import sm.rental.model.Seeds;
@@ -14,11 +13,11 @@ public class RVPs
 
     // Mean arrival times
     private static final double [] T1Means = {
-            15, 7.5, 2, 4, 3.33, 4.29, 4.62, 6, 15, 0, 6, 4.29, 3.75, 4, 8.57, 20, 15, 30 };
+            15, 7.5 , 2   , 4   , 3.33, 4.29, 4.62, 6   , 15  , 15, 15, 4.29, 3.75, 4, 8.57, 20, 15, 30 };
     private static final double [] T2Means = {
-            20, 10, 6.67, 4, 3.53, 3.16, 4.29, 10, 20, 0, 2.86, 4.29, 3.16, 5, 12, 30, 20, 20 };
+            20, 10  , 6.67, 4   , 3.53, 3.16, 4.29, 10  , 20  , 15, 2.86, 4.29, 3.16, 5, 12, 30, 20, 20 };
     private static final double [] RCMeans = {
-            5, 6.67, 3.33, 2.14, 2.61, 2.86, 3.75, 5.45, 3.53, 0, 1.67, 2.5, 1.875, 3.75, 4.62, 4.62, 12, 15 };
+            5 , 6.67, 3.33, 2.14, 2.61, 2.86, 3.75, 5.45, 3.53, 15, 1.67, 2.5, 1.875, 3.75, 4.62, 4.62, 12, 15 };
 
     // Percentage of additional passengers with customers
     private static final double Additional3 = 0.05;
@@ -47,7 +46,7 @@ public class RVPs
 	// Constructor
 	public static void ConfigureRVPs(SMRental smRental, Seeds sd) {
 		model = smRental;
-		// Set up distribution functions
+
 		NCustomerT1 = new Exponential(1.0/T1Means[0], new MersenneTwister(sd.getNewCustomerSeedT1()));
 
 		NCustomerT2 = new Exponential(1.0/T2Means[0], new MersenneTwister(sd.getNewCustomerSeedT2()));
@@ -68,7 +67,6 @@ public class RVPs
         double t = model.getClock();
         double mean = getMean(T1Means, t);
         nextCustomer = t + NCustomerT1.nextDouble(1.0/mean);
-        //missing if statement to determine if past closing time of the system, missing parameter
         if(nextCustomer > model.getEndTime())
             nextCustomer = -1.0;  // Ends time sequence
         return nextCustomer;
@@ -77,9 +75,9 @@ public class RVPs
 	public static double DuNCustomerT2(){
         double nextCustomer;
         double t = model.getClock();
-        double mean = getMean(T1Means, t);
+        double mean;
+        mean = getMean(T1Means, t);
         nextCustomer = t+ NCustomerT2.nextDouble(1.0/mean);
-        //missing if statement to determine if past closing time of the system, missing parameter
         if(nextCustomer > model.getEndTime())
             nextCustomer = -1.0;  // Ends time sequence
         return nextCustomer;
@@ -88,9 +86,9 @@ public class RVPs
 	public static double DuRCustomer(){
 		double nextCustomer;
         double t = model.getClock();
-		double mean = getMean(RCMeans, t);
+        double mean;
+		mean = getMean(RCMeans, t);
 		nextCustomer = t+ RCustomer.nextDouble(1.0/mean);
-		//missing if statement to determine if past closing time of the system, missing parameter
         if(nextCustomer > model.getEndTime())
             nextCustomer = -1.0;  // Ends time sequence
 		return nextCustomer;
@@ -122,14 +120,14 @@ public class RVPs
 		double boardingTime = 0;
 		for(int i = 0; i < numPassengers; i++)
 			boardingTime += BoardingTime.nextDouble();
-		return boardingTime/60;
+		return boardingTime/60.0;
 	}
 
 	public static double uExitingTime(int numPassengers){
 		double exitTime = 0;
 		for(int i = 0; i < numPassengers; i++)
 			exitTime += ExitingTime.nextDouble();
-		return exitTime/60;
+		return exitTime/60.0;
 	}
 
 	private static double getMean(double [] means, double t) {

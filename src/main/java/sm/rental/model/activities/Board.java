@@ -22,16 +22,16 @@ public class Board extends ConditionalActivity {
     private Van van = null;
 
     public static boolean precondition (SMRental model){
-        return UDPs.CanCustomerBoardVan(model);
+        return getVanForBoarding(model).isPresent();
     }
 
     @SneakyThrows
     public void startingEvent(){
-        Optional<Van> possibleVan = UDPs.GetVanForBoarding(model);
+        Optional<Van> possibleVan = getVanForBoarding(model);
         if(!possibleVan.isPresent())
             throw new RuntimeException("Event Started but precondition must've been false: No van present");
         van = possibleVan.get();
-        Optional<Customer> possibleCustomer = getCustomerToBoard(model, van);
+        Optional<Customer> possibleCustomer = getCustomerForBoarding(model, van);
         if(!possibleCustomer.isPresent())
             throw new RuntimeException("Event Started but precondition must've been false: No customer present");
         customer = possibleCustomer.get();
@@ -49,21 +49,35 @@ public class Board extends ConditionalActivity {
     }
 
     // Local User Defined procedures
-    private static Optional<Customer> getCustomerToBoard(SMRental model, Van van){
+    /**
+     * Returns a van that can load a customer at its location.
+     * Searches a van and returns the first van that UDP.CanLoadVan(Van) returns true for.
+     * Otherwise returns false.
+     **/
+    private static Optional<Van> getVanForBoarding(SMRental model) {
+        return model.getVans().stream()
+                .filter(UDPs::CanVanLoad)
+                .findFirst();
+    }
+
+    /**
+     * Finds the first appropriate customer at the vans location for boarding.
+     * Otherwise returns false.
+     * Uses UDP.GetCustomersAwaiting(Van.Location) to get the queue of customers (awaitingQueue)
+     * as input to UDP.GetFirstAppropriateCustomer(awaitingQueue, Van.seatsAvailable)
+     **/
+    private static Optional<Customer> getCustomerForBoarding(SMRental model, Van van) {
         Optional<LinkedList<Customer>> queue = UDPs.GetLocationForBoarding(model, van);
         if(!queue.isPresent()) return Optional.empty();
-        Optional<Customer> possibleCustomer = queue.get().stream()
-                .filter(customer -> customer.getNumPassengers() <= van.getSeatsAvailable())
-                .findFirst();
+        Optional<Customer> possibleCustomer = UDPs.GetFirstAppropriateCustomer(queue.get(), van.getSeatsAvailable());
         possibleCustomer.ifPresent(queue.get()::remove);
         return possibleCustomer;
     }
 
     // Predicate
     public static final Function<SMRental,Optional<ConditionalActivity>> function = (SMRental model) -> {
-        if(Board.precondition(model)){
+        if(Board.precondition(model))
             return Optional.of(new Board(model));
-        }
         else return Optional.empty();
     };
 }
