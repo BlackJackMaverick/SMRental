@@ -2,12 +2,10 @@ package  sm.rental.model.entities;
 
 import lombok.*;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Optional;
 
-@Data
-@RequiredArgsConstructor
+@ToString(exclude="group")
 public class Van {
     public enum VanStatus {
         BOARDING,
@@ -23,20 +21,33 @@ public class Van {
         DROP_OFF,
         RENTAL_COUNTER
     }
-    @Getter private VanStatus status;
-    @Getter private VanLocation location;
+
+    @Getter private int vanId;
+    @Getter @Setter private VanStatus status;
+    @Getter @Setter private VanLocation location;
     private LinkedList<Customer> group;
     @Getter private int capacity; //Maximum number of seats in the van.
     @Getter private double mileage; //Total number of miles driven by the van in the observation interval
-    @NonNull @Getter private final Integer seatsAvailable; //Number of available seats in the van
+    @Getter private int seatsAvailable; //Number of available seats in the van
+
+    public Van(int capacity, int id){
+        vanId=id;
+        status = VanStatus.LOADING;
+        location = VanLocation.TERMINAL1;
+        this.capacity = this.seatsAvailable = capacity;
+        group = new LinkedList<>();
+    }
 
     // Required methods to manipulate the group
     public void addCustomer(Customer customer) {
         group.offerLast(customer);
+        seatsAvailable -= customer.getNumPassengers();
     }
 
     public Optional<Customer> removeNextCustomer() {
-        return Optional.ofNullable(group.pop());
+        Optional<Customer> possibleCustomer = Optional.ofNullable(group.pop());
+        possibleCustomer.ifPresent(c->seatsAvailable += c.getNumPassengers());
+        return possibleCustomer;
     }
 
     public int getN() {

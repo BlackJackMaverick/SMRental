@@ -1,7 +1,9 @@
 package sm.rental.model.entities;
 
+import lombok.ToString;
 import lombok.Value;
 
+@ToString
 @Value
 public class Customer {
     public enum CustomerType {

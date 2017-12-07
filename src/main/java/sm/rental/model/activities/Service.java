@@ -1,42 +1,47 @@
 package sm.rental.model.activities;
 
-import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import simulationModelling.ConditionalActivity;
+import simulationModelling.ScheduledActivity;
 import sm.rental.model.SMRental;
+import sm.rental.model.actions.ReturningArrival;
 import sm.rental.model.entities.Customer;
 import sm.rental.model.entities.Customer.CustomerType;
 import sm.rental.model.entities.RentalCounter;
+import sm.rental.model.procedures.RVPs;
+import sm.rental.model.procedures.UDPs;
 
-import static sm.rental.model.procedures.UDPs.HandleCustomerExit;
+import java.util.Optional;
+import java.util.function.Function;
 
-public class Service extends ConditionalActivity{
-    @Getter private Customer icgCustomer = null;
-    @Getter private SMRental model;
+@RequiredArgsConstructor
+public class Service extends ConditionalActivity {
+    @NonNull private final SMRental model;
 
-    public Service(SMRental model){
-        this.model = model;
+    private Customer customer;
+
+    public static boolean precondition(SMRental model) {
+        return (model.getRentalLine().size() > 0)
+                && isAgentAvailable(model.getRentalCounter());
     }
-
-    protected static boolean precondition(SMRental model){
-        return model.getQRentalLine().size() > 0 && isAgentAvailable(model.getRgRentalCounter());
-    }
-    public void startingEvent(){
+    public void startingEvent() {
         occupyAgent();
-        icgCustomer = model.getQRentalLine().pop(); // Remove customer
+        customer = model.getRentalLine().pop(); // Remove customer
+        if(customer == null)
+            throw new RuntimeException("Couldn't service");
     }
 
-    public double duration(){
-        return model.getRvp().uServiceTime(icgCustomer.getUType());
+    public double duration() {
+        return RVPs.uServiceTime(customer.getUType());
     }
 
-    public void terminatingEvent(){
+    public void terminatingEvent() {
         freeAgent();
-        if(icgCustomer.getUType() == CustomerType.NEW){
-            HandleCustomerExit(icgCustomer);
-        } else {
-            model.getQReturnLine().offerLast(icgCustomer);
-        }
-        icgCustomer = null;
+        if(customer.getUType() == CustomerType.NEW)
+            UDPs.HandleCustomerExit(customer);
+        else
+            model.getReturnLine().offerLast(customer);
     }
 
     //Local User Defined Procedures
@@ -45,10 +50,18 @@ public class Service extends ConditionalActivity{
     }
 
     private void freeAgent(){
-        model.getRgRentalCounter().addAgent();
+        model.getRentalCounter().addAgent();
     }
 
     private void occupyAgent(){
-        model.getRgRentalCounter().removeAgent();
+        model.getRentalCounter().removeAgent();
     }
+
+    // Predicate
+
+    public static final Function<SMRental, Optional<ConditionalActivity>> function = (SMRental model) -> {
+        if(Service.precondition(model))
+            return Optional.of(new Service(model));
+        else return Optional.empty();
+    };
 }

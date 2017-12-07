@@ -16,8 +16,7 @@ public class Seeds
 	@Getter private int newCustomerServiceTimeSeed;   // new customer seed
 	@Getter private int returningCustomerServiceTimeSeed;   // returning customer seed
 
-	public Seeds(RandomSeedGenerator rsg)
-	{
+	public Seeds(RandomSeedGenerator rsg) {
 		newCustomerSeedT1 = rsg.nextSeed();
 		newCustomerSeedT2 = rsg.nextSeed();
 		returningCustomerSeed = rsg.nextSeed();

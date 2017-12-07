@@ -5,19 +5,19 @@ import lombok.RequiredArgsConstructor;
 import simulationModelling.ScheduledAction;
 import sm.rental.model.SMRental;
 import sm.rental.model.entities.Customer;
+import sm.rental.model.entities.Customer.CustomerType;
+import sm.rental.model.procedures.RVPs;
 
 @RequiredArgsConstructor
-class ReturningArrival extends ScheduledAction{
+public class ReturningArrival extends ScheduledAction {
     @NonNull private final SMRental model;
 
-    public double timeSequence(){
-        return model.getRvp().DuRCustomer();
+    public double timeSequence() {
+        return RVPs.DuRCustomer();
     }
 
-    public void actionEvent(){
-        double startTime = model.getClock();
-        int numPassengers = model.getRvp().uNumPassengers();
-        Customer icgCustomer = new Customer( startTime, Customer.CustomerType.RETURNING, numPassengers );
-        model.getQRentalLine().offerLast(icgCustomer);
+    public void actionEvent() {
+        Customer customer = new Customer(model.getClock(), CustomerType.RETURNING, RVPs.uNumPassengers() + 1);
+        model.getRentalLine().offerLast(customer);
     }
 }
