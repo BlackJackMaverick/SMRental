@@ -16,6 +16,13 @@ import static java.util.stream.Collectors.toList;
 
 class Experiment
 {
+    private static List<List<Result>> case1;
+    private static List<List<Result>> case2;
+    private static List<List<Result>> case3;
+    private static List<List<Result>> improvedcase1;
+    private static List<List<Result>> improvedcase2;
+    private static List<List<Result>> improvedcase3;
+
 
     private static String RESULT_LIST_FORMAT =
             "Result Summary for capacity %d { Avg cost: %.2f, Avg Satisfaction: %.2f Number of Vans: %d, Number of Agents: %d }%n";
@@ -24,7 +31,7 @@ class Experiment
 
     public static void main(String[] args)
     {
-        int NUMRUNS = 1000;
+        int NUMRUNS = 3;
         double startTime = 0.0, endTime = 270.0;
 
 
@@ -41,14 +48,15 @@ class Experiment
          * SEARCHING FOR A 85% SATISFACTION RATE
          */
         System.out.println(" Case 1 - Base");
+        case1 = caseOneResultsBase;
         caseOneResultsBase.forEach(Experiment::printResultList);
         System.out.println(">-----------------------------------------------<");
 
         List<List<Result>> caseTwoResultsBase = caseTwo(caseOneResultsBase, NUMRUNS, startTime,
                                                         endTime, seeds, false);
 
-
         System.out.println(" Case 2 - Base");
+        case2 = caseTwoResultsBase;
         caseTwoResultsBase.forEach(Experiment::printResultList);
         System.out.println(">-----------------------------------------------<");
 
@@ -57,9 +65,12 @@ class Experiment
                 .collect(toList());
 
         System.out.println(" Case 3 - Base");
+        case3 = caseThreeResultsBase;
         caseThreeResultsBase.forEach(Experiment::printResultList);
         System.out.println(">-----------------------------------------------<");
-
+        /*
+        Save all three cases and build a DisplayResult object to work with.
+         */
         List<List<Result>> caseOneResultsImproved = caseOne(NUMRUNS, startTime, endTime, seeds, true);
 
         /**
@@ -67,6 +78,7 @@ class Experiment
          * SEARCHING FOR A 90% SATISFACTION RATE
          */
         System.out.println(" Case 1 - Improved");
+        improvedcase1 = caseOneResultsImproved;
         caseOneResultsImproved.forEach(Experiment::printResultList);
         System.out.println(">-----------------------------------------------<");
 
@@ -74,6 +86,7 @@ class Experiment
                                                             endTime, seeds, true);
 
         System.out.println(" Case 2 - Improved");
+        improvedcase2 = caseTwoResultsImproved;
         caseTwoResultsImproved.forEach(Experiment::printResultList);
         System.out.println(">-----------------------------------------------<");
 
@@ -83,8 +96,15 @@ class Experiment
 
 
         System.out.println(" Case 3 - Improved");
+        improvedcase3 = caseThreeResultsImproved;
         caseThreeResultsImproved.forEach(Experiment::printResultList);
         System.out.println(">-----------------------------------------------<");
+
+        DisplayResult improvedCases = new DisplayResult(case1, case2, case3, improvedcase1, improvedcase2, improvedcase3);
+        System.out.println(improvedCases.ShowTable(improvedCases.getCase1()));
+        System.out.println(improvedCases.ShowTable(improvedCases.getCase2()));
+        System.out.println(improvedCases.ShowDifferenceTable(improvedCases.getCase1(),improvedCases.getCase2()));
+
     }
 
     /**
@@ -109,6 +129,7 @@ class Experiment
                         .findFirst()) // Return the first configuration that satisfies this, since it is sequential, it will be the mininmum van configuration
                 .map(Optional::get) //Removes the optional type encapsulation returned by findfirst
                 .collect(toList());
+
     }
 
 
