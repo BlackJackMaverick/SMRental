@@ -32,6 +32,7 @@ class Experiment
     public static void main(String[] args)
     {
         int NUMRUNS = 3;
+        double confidence = 95;
         double startTime = 0.0, endTime = 270.0;
 
 
@@ -100,7 +101,7 @@ class Experiment
         caseThreeResultsImproved.forEach(Experiment::printResultList);
         System.out.println(">-----------------------------------------------<");
 
-        DisplayResult improvedCases = new DisplayResult(case1, case2, case3, improvedcase1, improvedcase2, improvedcase3);
+        DisplayResult improvedCases = new DisplayResult(case1, case2, case3, improvedcase1, improvedcase2, improvedcase3, NUMRUNS, confidence);
         System.out.println(improvedCases.ShowTable(improvedCases.getCase1()));
         System.out.println(improvedCases.ShowTable(improvedCases.getCase2()));
         System.out.println(improvedCases.ShowDifferenceTable(improvedCases.getCase1(),improvedCases.getCase2()));
