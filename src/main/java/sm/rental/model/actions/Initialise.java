@@ -20,9 +20,9 @@ public class Initialise extends ScheduledAction {
 	}
 
 	public void actionEvent() {
-		ArrayList<Van> vans = model.getVans();
+		Van [] vans = model.getRqVans();
 		int numVans = model.getNumVans();
 		int vanCapacity = model.getNumSeats();
-		for(int i=0; i<numVans; i++) vans.add(new Van(vanCapacity, i));
+		for(int i=0; i<numVans; i++) vans[i] = new Van(vanCapacity, i);
 	}
 }

@@ -11,6 +11,7 @@ import simulationModelling.ConditionalActivity;
 import sm.rental.model.procedures.RVPs;
 import sm.rental.model.procedures.UDPs;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Optional;
 import java.util.function.Function;
@@ -19,7 +20,7 @@ import java.util.function.Function;
 public class Board extends ConditionalActivity {
     @NonNull private final SMRental model;
     private Customer customer = null;
-    private Van van = null;
+    private Integer van = null;
 
     public static boolean precondition (SMRental model){
         return getVanForBoarding(model).isPresent();
@@ -27,10 +28,10 @@ public class Board extends ConditionalActivity {
 
     @SneakyThrows
     public void startingEvent(){
-        Optional<Van> possibleVan = getVanForBoarding(model);
-        if(!possibleVan.isPresent())
+        Optional<Integer> possibleVanID = getVanForBoarding(model);
+        if(!possibleVanID.isPresent())
             throw new RuntimeException("Event Started but precondition must've been false: No van present");
-        van = possibleVan.get();
+        van = possibleVanID.get();
         Optional<Customer> possibleCustomer = getCustomerForBoarding(model, van);
         if(!possibleCustomer.isPresent())
             throw new RuntimeException("Event Started but precondition must've been false: No customer present");
@@ -54,9 +55,10 @@ public class Board extends ConditionalActivity {
      * Searches a van and returns the first van that UDP.CanLoadVan(Van) returns true for.
      * Otherwise returns false.
      **/
-    private static Optional<Van> getVanForBoarding(SMRental model) {
-        return model.getVans().stream()
+    private static Optional<Integer> getVanForBoarding(SMRental model) {
+        return Arrays.stream(model.getRqVans())
                 .filter(UDPs::CanVanLoad)
+                .map(Van::getVanId)
                 .findFirst();
     }
 
@@ -66,10 +68,11 @@ public class Board extends ConditionalActivity {
      * Uses UDP.GetCustomersAwaiting(Van.Location) to get the queue of customers (awaitingQueue)
      * as input to UDP.GetFirstAppropriateCustomer(awaitingQueue, Van.seatsAvailable)
      **/
-    private static Optional<Customer> getCustomerForBoarding(SMRental model, Van van) {
-        Optional<LinkedList<Customer>> queue = UDPs.GetLocationForBoarding(model, van);
+    private static Optional<Integer> getCustomerForBoarding(SMRental model, int vanid) {
+        Optional<LinkedList<Customer>> queue = UDPs.GetLocationForBoarding(model, vanid);
         if(!queue.isPresent()) return Optional.empty();
-        Optional<Customer> possibleCustomer = UDPs.GetFirstAppropriateCustomer(queue.get(), van.getSeatsAvailable());
+        Optional<Customer> possibleCustomer = UDPs.GetFirstAppropriateCustomer(
+                queue.get(), model.getRqVans()[vanid].getSeatsAvailable());
         possibleCustomer.ifPresent(queue.get()::remove);
         return possibleCustomer;
     }

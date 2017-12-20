@@ -29,26 +29,21 @@ public class UDPs {
      * If the customer is satisfied (Meets the corresponding turnaround time for the type of customer)
      * Updates the percent satisfied
      **/
-    public static void HandleCustomerExit(Customer customer) {
+    public static void HandleCustomerExit(Customer iCGCustomer) {
 
         double t = model.getClock();
-	    if(customer.getUType() == CustomerType.NEW){
-            if((t - customer.getStartTime()) <= ACCEPTABLE_N_TURNARROUNDT) model.getSsovs().addSatisfiedCust();
+	    if(iCGCustomer.getUType() == CustomerType.NEW){
+            if((t - iCGCustomer.getStartTime()) <= ACCEPTABLE_N_TURNARROUNDT) model.getSsovs().addSatisfiedCust();
             else model.getSsovs().addUnsatisfiedCust();
         } else {
-            if((t - customer.getStartTime()) <= ACCEPTABLE_R_TURNARROUNDT) model.getSsovs().addSatisfiedCust();
+            if((t - iCGCustomer.getStartTime()) <= ACCEPTABLE_R_TURNARROUNDT) model.getSsovs().addSatisfiedCust();
             else model.getSsovs().addUnsatisfiedCust();
         }
 	}
 
-    public static void UpdateVanStatus(Van van, VanStatus status){
-        van.setStatus(status);
-    }
-
-
-    public static void UpdateVanLocation(Van van, VanLocation destination) {
-        van.addMileage(UDPs.GetDistanceTravelled(van.getLocation(), destination));
-        van.setLocation(destination);
+    public static void UpdateVanLocation(int vanid, VanLocation destination) {
+        model.getRqVans()[vanid].addMileage(UDPs.GetDistanceTravelled(model.getRqVans()[vanid].getLocation(), destination));
+        model.getRqVans()[vanid].setLocation(destination);
     }
 
     /**
@@ -58,10 +53,10 @@ public class UDPs {
      *  The vans status is UNLOADING
      *  The van has customers
      **/
-    public static boolean CanVanUnload(Van van) {
-        if(van.getLocation() == VanLocation.DROP_OFF || van.getLocation() == VanLocation.RENTAL_COUNTER)
-            if(van.getStatus() == VanStatus.UNLOADING)
-                if(van.getN()>0)
+    public static boolean CanVanUnload(int vanid) {
+        if(model.getRqVans()[vanid].getLocation() == VanLocation.DROP_OFF || model.getRqVans()[vanid].getLocation() == VanLocation.RENTAL_COUNTER)
+            if(model.getRqVans()[vanid].getStatus() == VanStatus.UNLOADING)
+                if(model.getRqVans()[vanid].getN()>0)
                     return true;
         return false;
     }

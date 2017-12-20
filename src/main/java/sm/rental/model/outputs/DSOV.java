@@ -6,6 +6,8 @@ import sm.rental.model.Constants;
 import sm.rental.model.SMRental;
 import sm.rental.model.entities.Van;
 
+import java.util.Arrays;
+
 import static sm.rental.model.Constants.DRIVER_COST;
 import static sm.rental.model.Constants.RA_COST;
 
@@ -16,7 +18,7 @@ public class DSOV {
 	private final double perMileCost;
 
 	public double vanCost(){
-	    return (model.getVans().stream()
+	    return (Arrays.asList(model.getRqVans()).stream()
                 .mapToDouble(Van::getMileage)
                 .sum() * perMileCost) +
                 (model.getNumVans() * DRIVER_COST * SHIFT);
