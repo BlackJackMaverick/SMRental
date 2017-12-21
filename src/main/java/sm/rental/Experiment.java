@@ -14,8 +14,14 @@ import static java.util.stream.Collectors.toList;
 
 // Main Method: Experiments
 
-class Experiment
-{
+public class Experiment {
+    private static List<List<Result>> case1;
+    private static List<List<Result>> case2;
+    private static List<List<Result>> case3;
+    private static List<List<Result>> improvedcase1;
+    private static List<List<Result>> improvedcase2;
+    private static List<List<Result>> improvedcase3;
+
 
     private static String RESULT_LIST_FORMAT =
             "Result Summary for capacity %d { Avg cost: %.2f, Avg Satisfaction: %.2f Number of Vans: %d, Number of Agents: %d }%n";
@@ -24,7 +30,8 @@ class Experiment
 
     public static void main(String[] args)
     {
-        int NUMRUNS = 1000;
+        int NUMRUNS = 100;
+        double confidence = 95;
         double startTime = 0.0, endTime = 270.0;
 
 
@@ -40,51 +47,66 @@ class Experiment
          * BASE EXPERIMENTS
          * SEARCHING FOR A 85% SATISFACTION RATE
          */
-        System.out.println(" Case 1 - Base");
-        caseOneResultsBase.forEach(Experiment::printResultList);
-        System.out.println(">-----------------------------------------------<");
+        case1 = caseOneResultsBase;
 
         List<List<Result>> caseTwoResultsBase = caseTwo(caseOneResultsBase, NUMRUNS, startTime,
                                                         endTime, seeds, false);
 
-
-        System.out.println(" Case 2 - Base");
-        caseTwoResultsBase.forEach(Experiment::printResultList);
-        System.out.println(">-----------------------------------------------<");
-
+        case2 = caseTwoResultsBase;
         List<List<Result>> caseThreeResultsBase = caseTwoResultsBase.stream()
                 .map(r -> caseThree(r, NUMRUNS, startTime, endTime, seeds, false))
                 .collect(toList());
 
-        System.out.println(" Case 3 - Base");
-        caseThreeResultsBase.forEach(Experiment::printResultList);
-        System.out.println(">-----------------------------------------------<");
-
+        case3 = caseThreeResultsBase;
+        /*
+        Save all three cases and build a DisplayResult object to work with.
+         */
         List<List<Result>> caseOneResultsImproved = caseOne(NUMRUNS, startTime, endTime, seeds, true);
 
         /**
          * IMPROVED EXPERIMENTS
          * SEARCHING FOR A 90% SATISFACTION RATE
          */
-        System.out.println(" Case 1 - Improved");
-        caseOneResultsImproved.forEach(Experiment::printResultList);
-        System.out.println(">-----------------------------------------------<");
+        improvedcase1 = caseOneResultsImproved;
 
         List<List<Result>> caseTwoResultsImproved = caseTwo(caseOneResultsImproved, NUMRUNS, startTime,
                                                             endTime, seeds, true);
 
-        System.out.println(" Case 2 - Improved");
-        caseTwoResultsImproved.forEach(Experiment::printResultList);
-        System.out.println(">-----------------------------------------------<");
-
+        improvedcase2 = caseTwoResultsImproved;
         List<List<Result>> caseThreeResultsImproved = caseTwoResultsImproved.stream()
                 .map(r -> caseThree(r, NUMRUNS, startTime, endTime, seeds, true))
                 .collect(toList());
 
 
-        System.out.println(" Case 3 - Improved");
-        caseThreeResultsImproved.forEach(Experiment::printResultList);
-        System.out.println(">-----------------------------------------------<");
+        improvedcase3 = caseThreeResultsImproved;
+
+        DisplayResult improvedCases = new DisplayResult(case1,
+                                                        case2,
+                                                        case3,
+                                                        improvedcase1,
+                                                        improvedcase2,
+                                                        improvedcase3,
+                                                        NUMRUNS,
+                                                        confidence);
+        System.out.println("Printing Base case 1\n");
+        System.out.println(improvedCases.ShowTable(improvedCases.getCase1()));
+        System.out.println("Printing Base case 2\n");
+        System.out.println(improvedCases.ShowTable(improvedCases.getCase2()));
+        System.out.println("Printing Base case 3\n");
+        System.out.println(improvedCases.ShowTable(improvedCases.getCase3()));
+        System.out.println("Printing improved case 1\n");
+        System.out.println(improvedCases.ShowTable(improvedCases.getImprovedCase1()));
+        System.out.println("Printing improved case 2\n");
+        System.out.println(improvedCases.ShowTable(improvedCases.getImprovedCase2()));
+        System.out.println("Printing improved case 3\n");
+        System.out.println(improvedCases.ShowTable(improvedCases.getImprovedCase3()));
+        System.out.println("Printing Diff case 2 - case 3");
+        System.out.println(improvedCases.ShowDifferenceTable(improvedCases.getCase2(),improvedCases.getCase3()));
+        System.out.println("Printing Diff Improved case 2 - Improved case 3");
+        System.out.println(improvedCases.ShowDifferenceTable(improvedCases.getImprovedCase2(),improvedCases.getImprovedCase3()));
+        System.out.println("Printing Diff Improved case 3 - Improved case 3");
+        System.out.println(improvedCases.ShowDifferenceTable(improvedCases.getCase3(),improvedCases.getImprovedCase3()));
+
     }
 
     /**
@@ -109,6 +131,7 @@ class Experiment
                         .findFirst()) // Return the first configuration that satisfies this, since it is sequential, it will be the mininmum van configuration
                 .map(Optional::get) //Removes the optional type encapsulation returned by findfirst
                 .collect(toList());
+
     }
 
 
