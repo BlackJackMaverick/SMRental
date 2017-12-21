@@ -7,32 +7,49 @@ import java.util.ArrayList;
 import java.util.List;
 import java.lang.StringBuilder;
 
-public class DisplayResult{
+public class DisplayResult {
     /*
     Save all the different cases as instance variables. Notice the 'final' tag since they will remain unaltered.
      */
-    @Getter private final List<List<Result>> case1;
-    @Getter private final List<List<Result>> case2;
-    @Getter private final List<List<Result>> case3;
-    @Getter private final List<List<Result>> improvedCase1;
-    @Getter private final List<List<Result>> improvedCase2;
-    @Getter private final List<List<Result>> improvedCase3;
-    @Getter private final int NUMRUNS;
-    @Getter private final double confidence;
+    @Getter
+    private final List<List<Result>> case1;
+    @Getter
+    private final List<List<Result>> case2;
+    @Getter
+    private final List<List<Result>> case3;
+    @Getter
+    private final List<List<Result>> improvedCase1;
+    @Getter
+    private final List<List<Result>> improvedCase2;
+    @Getter
+    private final List<List<Result>> improvedCase3;
+    @Getter
+    private final int NUMRUNS;
+    @Getter
+    private final double confidence;
+
+    //RAWRS WHY DO I NEEED TO FIX THIS FRINTING SHENANIGANS
+    String sfinterval = "\t[%6.2f - %6.2f, %6.2f + %6.2f]";
 
     /*
     Constructor to initialize instance variables.
      */
-    public DisplayResult(List<List<Result>> c1, List<List<Result>> c2, List<List<Result>> c3,
-                         List<List<Result>> ic1, List<List<Result>> ic2, List<List<Result>> ic3, int runs, double confidence){
+    public DisplayResult(List<List<Result>> c1,
+                         List<List<Result>> c2,
+                         List<List<Result>> c3,
+                         List<List<Result>> ic1,
+                         List<List<Result>> ic2,
+                         List<List<Result>> ic3,
+                         int runs,
+                         double confidence) {
         this.improvedCase1 = ic1;
         this.improvedCase2 = ic2;
         this.improvedCase3 = ic3;
-        this.case1=c1;
-        this.case2=c2;
-        this.case3=c3;
-        this.NUMRUNS=runs;
-        this.confidence=confidence;
+        this.case1 = c1;
+        this.case2 = c2;
+        this.case3 = c3;
+        this.NUMRUNS = runs;
+        this.confidence = confidence;
     }
 
     /*
@@ -74,7 +91,8 @@ public class DisplayResult{
                 s.append(j.getOverAllCost());
                 s.append("\n");
 
-                //switch statements decides which subcase we are in and adds it to the sample of each StatisticsUtils array accordingly.
+                //switch statements decides which subcase we are in and adds it to the sample of each StatisticsUtils
+                // array accordingly.
                 switch (j.getCapacity()) {
                     //subcase when van capacity is 12
                     case 12:
@@ -102,39 +120,39 @@ public class DisplayResult{
         //build confidence intervals section.
         s.append("Confidence Intervals \n");
         //add headers to table
-        s.append("Van Capacity: \t\t\t\t\t");
-        s.append("12\t\t\t\t\t\t");
-        s.append("18\t\t\t\t\t\t\t ");
-        s.append("30\n");
-        s.append(" Customers Served: ");
+        s.append(" Van Capacity:\t\t\t12\t\t\t\t\t\t\t\t\t\t18\t\t\t\t\t\t\t\t\t\t30\n");
+        s.append(" Customers Served:\t");
 
         //print out confidence interval for customers served for the subcases when van capacity is 12, 18, 30
         for (int i = 0; i < CustServedStats.length; i++) {
-        s.append("[" + String.format("%.2f", CustServedStats[i].getMean()) + "-" +
-                String.format("%.2f", getConfidenceInterval(CustServedStats[i])) + ", " +
-                String.format("%.2f", CustServedStats[i].getMean()) + "+" +
-                String.format("%.2f", getConfidenceInterval(CustServedStats[i])) + "]");
-        s.append(" ");
+            s.append(String.format(sfinterval,
+                                   CustServedStats[i].getMean(),
+                                   getConfidenceInterval(CustServedStats[i]),
+                                   CustServedStats[i].getMean(),
+                                   getConfidenceInterval(CustServedStats[i])));
+            s.append("\t");
         }
 
-        s.append("\n Satisfaction Rate:\t ");
+        s.append("\n Satisfaction Rate:\t");
         //print out confidence interval for Satisfaction Rate for the subcases when van capacity is 12, 18, 30
         for (int i = 0; i < SatisfactionRateStats.length; i++) {
-            s.append("[" + String.format("%.2f", SatisfactionRateStats[i].getMean()) + "-" +
-                    String.format("%.2f", getConfidenceInterval(SatisfactionRateStats[i])) + ", " +
-                    String.format("%.2f", SatisfactionRateStats[i].getMean()) + "+" +
-                    String.format("%.2f", getConfidenceInterval(SatisfactionRateStats[i])) + "]");
-            s.append("   ");
+            s.append(String.format(sfinterval,
+                                   SatisfactionRateStats[i].getMean(),
+                                   getConfidenceInterval(SatisfactionRateStats[i]),
+                                   SatisfactionRateStats[i].getMean(),
+                                   getConfidenceInterval(SatisfactionRateStats[i])));
+            s.append("\t");
         }
 
-        s.append("\n Cost:\t\t\t");
+        s.append("\n Cost:\t\t\t\t");
         //print out confidence interval for Cost for the subcases when van capacity is 12, 18, 30
         for (int i = 0; i < CostStats.length; i++) {
-            s.append("[" + String.format("%.2f", CostStats[i].getMean()) + "-" +
-                    String.format("%.2f", getConfidenceInterval(CostStats[i])) + ", " +
-                    String.format("%.2f", CostStats[i].getMean()) + "+" +
-                    String.format("%.2f", getConfidenceInterval(CostStats[i])) + "]");
-            s.append("   ");
+            s.append(String.format(sfinterval,
+                                   CostStats[i].getMean(),
+                                   getConfidenceInterval(CostStats[i]),
+                                   CostStats[i].getMean(),
+                                   getConfidenceInterval(CostStats[i])));
+            s.append("\t");
         }
         s.append("\n >-----------------------------------------------<\n");
         //return print out of the table
@@ -142,9 +160,10 @@ public class DisplayResult{
     }
 
     /*
-    Modified version of the above method that returns a comparative print out between two cases. They are given as parameters.
+    Modified version of the above method that returns a comparative print out between two cases. They are given as
+    parameters.
      */
-    public String ShowDifferenceTable(List<List<Result>> difference1, List<List<Result>> difference2){
+    public String ShowDifferenceTable(List<List<Result>> difference1, List<List<Result>> difference2) {
         // array of size 3 to store the separate subcases when van capacity is equal to 12, 18, and 30.
         StatisticsUtils[] diffCustServedStats = new StatisticsUtils[3];
         StatisticsUtils[] diffSatisfactionRateStats = new StatisticsUtils[3];
@@ -158,7 +177,7 @@ public class DisplayResult{
         //Initialize StringBuilder
         StringBuilder s = new StringBuilder();
         //Initialize counter to keep track of the current run.
-        int runNumber=1;
+        int runNumber = 1;
         //add header to table.
         s.append("Run Number \t Van Capacity \t Customers Served \t Customer Satisfaction \t Cost");
         s.append("\n");
@@ -167,93 +186,91 @@ public class DisplayResult{
         for (int i = 0; i < difference1.size(); i++) {
             runNumber = 1;
             for (int j = 0; j < difference1.get(i).size(); j++) {
-                //add data to table row by row
-                s.append(runNumber);
-                s.append("\t\t\t\t");
-                s.append(difference1.get(i).get(j).getCapacity() - difference2.get(i).get(j).getCapacity());
-                s.append("\t\t\t\t\t");
-                s.append(difference1.get(i).get(j).getCustomersServed() - difference2.get(i).get(j).getCustomersServed());
-                s.append("\t\t\t\t\t");
-                s.append(String.format("%.2f", difference1.get(i).get(j).getSatisfactionRate() - difference2.get(i).get(j).getSatisfactionRate()));
-                s.append("\t\t\t ");
-                s.append(difference1.get(i).get(j).getOverAllCost() - difference2.get(i).get(j).getOverAllCost());
-                s.append("\n");
-                runNumber++;
+                    //add data to table row by row
+                    s.append(runNumber);
+                    s.append("\t\t\t\t");
+                    s.append(difference1.get(i).get(j).getCapacity());
+                    s.append("\t\t\t\t\t");
+                    s.append(difference1.get(i).get(j).getCustomersServed()
+                                     - difference2.get(i).get(j).getCustomersServed());
+                    s.append("\t\t\t\t\t");
+                    s.append(String.format("%4.2f",
+                                           difference1.get(i).get(j).getSatisfactionRate()
+                                                   - difference2.get(i).get(j).getSatisfactionRate()));
+                    s.append("\t\t\t ");
+                    s.append(difference1.get(i).get(j).getOverAllCost()
+                                     - difference2.get(i).get(j).getOverAllCost());
+                    s.append("\n");
+                    runNumber++;
 
-                //three different subcases. Data is added to sample depending if its the subcase with capacity of 12, 18, 30 for the vans.
-                if (difference1.get(i).get(j).getCapacity() == 12 && difference2.get(i).get(j).getCapacity() == 12) {
-                    diffCustServedStats[0].addValue(difference1.get(i).get(j).getCustomersServed() - difference2.get(i).get(j).getCustomersServed());
-                    diffSatisfactionRateStats[0].addValue(difference1.get(i).get(j).getSatisfactionRate() - difference2.get(i).get(j).getSatisfactionRate());
-                    diffCostStats[0].addValue(difference1.get(i).get(j).getOverAllCost() - difference2.get(i).get(j).getOverAllCost());
-                }
-                if (difference1.get(i).get(j).getCapacity() == 18 && difference2.get(i).get(j).getCapacity() == 18) {
-                    diffCustServedStats[1].addValue(difference1.get(i).get(j).getCustomersServed() - difference2.get(i).get(j).getCustomersServed());
-                    diffSatisfactionRateStats[1].addValue(difference1.get(i).get(j).getSatisfactionRate() - difference2.get(i).get(j).getSatisfactionRate());
-                    diffCostStats[1].addValue(difference1.get(i).get(j).getOverAllCost() - difference2.get(i).get(j).getOverAllCost());
-                }
-                if (difference1.get(i).get(j).getCapacity() == 30 && difference2.get(i).get(j).getCapacity() == 30) {
-                    diffCustServedStats[2].addValue(difference1.get(i).get(j).getCustomersServed() - difference2.get(i).get(j).getCustomersServed());
-                    diffSatisfactionRateStats[2].addValue(difference1.get(i).get(j).getSatisfactionRate() - difference2.get(i).get(j).getSatisfactionRate());
-                    diffCostStats[2].addValue(difference1.get(i).get(j).getOverAllCost() - difference2.get(i).get(j).getOverAllCost());
-                }
+                    //three different subcases. Data is added to sample depending if its the subcase with capacity of 12,
+                    // 18, 30 for the vans.
+                    if (difference1.get(i).get(j).getCapacity() == difference2.get(i).get(j).getCapacity() ) {
+                        diffCustServedStats[i].addValue(difference1.get(i).get(j).getCustomersServed()
+                                                                - difference2.get(i).get(j).getCustomersServed());
+                        diffSatisfactionRateStats[i].addValue(difference1.get(i).get(j).getSatisfactionRate()
+                                                                      - difference2.get(i).get(j).getSatisfactionRate());
+                        diffCostStats[i].addValue(difference1.get(i).get(j).getOverAllCost()
+                                                          - difference2.get(i).get(j).getOverAllCost());
+                    }
             }
         }
-                s.append(">-----------------------------------------------<\n");
+        s.append(">-----------------------------------------------<\n");
 
-                //build confidence intervals
-                s.append("Confidence Intervals \n");
-                s.append("Van Capacity: \t\t\t\t\t");
-                s.append("12\t\t\t\t\t\t");
-                s.append("18\t\t\t\t\t\t\t ");
-                s.append("30\n");
-                s.append(" Customers Served: ");
+        //build confidence intervals
+        s.append("Confidence Intervals \n");
+        s.append(" Van Capacity:\t\t\t12\t\t\t\t\t\t\t\t\t\t18\t\t\t\t\t\t\t\t\t\t30\n");
+        s.append(" Customers Served:\t");
 
-                //print out confidence interval for customers served for the subcases when van capacity is 12, 18, 30
-                for (int i = 0; i < diffCustServedStats.length; i++) {
-                    //add row for all the three sub cases for the number of customers served.
-                    s.append("[" + String.format("%.2f", diffCustServedStats[i].getMean()) + "-" +
-                            String.format("%.2f", getConfidenceInterval(diffCustServedStats[i])) + ", " +
-                            String.format("%.2f", diffCustServedStats[i].getMean()) + "+" +
-                            String.format("%.2f", getConfidenceInterval(diffCustServedStats[i])) + "]");
-                    s.append(" ");
-                }
-
-                s.append("\n Satisfaction Rate:\t ");
-                //print out confidence interval for Satisfaction Rate for the subcases when van capacity is 12, 18, 30
-                for (int i = 0; i < diffSatisfactionRateStats.length; i++) {
-                    //add row for all the three sub cases for Satisfaction rate.
-                    s.append("[" + String.format("%.2f", diffSatisfactionRateStats[i].getMean()) + "-" +
-                            String.format("%.2f", getConfidenceInterval(diffSatisfactionRateStats[i])) + ", " +
-                            String.format("%.2f", diffSatisfactionRateStats[i].getMean()) + "+" +
-                            String.format("%.2f", getConfidenceInterval(diffSatisfactionRateStats[i])) + "]");
-
-                    s.append("   ");
-                }
-
-                s.append("\n Cost:\t\t\t");
-                //print out confidence interval for Satisfaction Rate for the subcases when van capacity is 12, 18, 30
-                for (int i = 0; i < diffCostStats.length; i++) {
-                    //add row for all the three sub cases for overall cost.
-                    s.append("[" + String.format("%.2f", diffCostStats[i].getMean()) + "-" +
-                            String.format("%.2f", getConfidenceInterval(diffCostStats[i])) + ", " +
-                            String.format("%.2f", diffCostStats[i].getMean()) + "+" +
-                            String.format("%.2f", getConfidenceInterval(diffCostStats[i])) + "]");
-                    s.append("   ");
-                }
-                s.append("\n >-----------------------------------------------<\n");
-                //return print out of table.
-            return s.toString();
+        //print out confidence interval for customers served for the subcases when van capacity is 12, 18, 30
+        for (int i = 0; i < diffCustServedStats.length; i++) {
+            //add row for all the three sub cases for the number of customers served.
+            s.append(String.format(sfinterval,
+                                   diffCustServedStats[i].getMean(),
+                                   getConfidenceInterval(diffCustServedStats[i]),
+                                   diffCustServedStats[i].getMean(),
+                                   getConfidenceInterval(diffCustServedStats[i])));
+            s.append("\t");
         }
 
-        /*
-        Helper method to compute zeta for confidence intervals.
-         */
-        private double getConfidenceInterval(StatisticsUtils stat){
-            double sd = stat.getStdDev();
-            double rootn = Math.sqrt(NUMRUNS);
-            double confidenceFactor = Probability.studentT(NUMRUNS-1, confidence*0.01);
+        s.append("\n Satisfaction Rate:\t");
+        //print out confidence interval for Satisfaction Rate for the subcases when van capacity is 12, 18, 30
+        for (int i = 0; i < diffSatisfactionRateStats.length; i++) {
+            //add row for all the three sub cases for Satisfaction rate.
+            s.append(String.format(sfinterval,
+                                   diffSatisfactionRateStats[i].getMean(),
+                                   getConfidenceInterval(diffSatisfactionRateStats[i]),
+                                   diffSatisfactionRateStats[i].getMean(),
+                                   getConfidenceInterval(diffSatisfactionRateStats[i])));
 
-            return confidenceFactor*sd/rootn;
+            s.append("\t");
         }
+
+        s.append("\n Cost:\t\t\t\t");
+        //print out confidence interval for Satisfaction Rate for the subcases when van capacity is 12, 18, 30
+        for (int i = 0; i < diffCostStats.length; i++) {
+            //add row for all the three sub cases for overall cost.
+            s.append(String.format(sfinterval,
+                                   diffCostStats[i].getMean(),
+                                   getConfidenceInterval(diffCostStats[i]),
+                                   diffCostStats[i].getMean(),
+                                   getConfidenceInterval(diffCostStats[i])));
+            s.append("\t");
+        }
+        s.append("\n >-----------------------------------------------<\n");
+        //return print out of table.
+        return s.toString();
     }
+
+    /*
+    Helper method to compute zeta for confidence intervals.
+     */
+    private double getConfidenceInterval(StatisticsUtils stat) {
+        double sd = stat.getStdDev();
+        double rootn = Math.sqrt(NUMRUNS);
+        double confidenceFactor = Probability.studentT(NUMRUNS - 1, confidence * 0.01);
+
+        return confidenceFactor * sd / rootn;
+    }
+}
 

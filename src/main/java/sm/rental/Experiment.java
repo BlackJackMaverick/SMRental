@@ -14,8 +14,7 @@ import static java.util.stream.Collectors.toList;
 
 // Main Method: Experiments
 
-class Experiment
-{
+public class Experiment {
     private static List<List<Result>> case1;
     private static List<List<Result>> case2;
     private static List<List<Result>> case3;
@@ -31,7 +30,7 @@ class Experiment
 
     public static void main(String[] args)
     {
-        int NUMRUNS = 3;
+        int NUMRUNS = 4;
         double confidence = 95;
         double startTime = 0.0, endTime = 270.0;
 
@@ -48,27 +47,17 @@ class Experiment
          * BASE EXPERIMENTS
          * SEARCHING FOR A 85% SATISFACTION RATE
          */
-        System.out.println(" Case 1 - Base");
         case1 = caseOneResultsBase;
-        caseOneResultsBase.forEach(Experiment::printResultList);
-        System.out.println(">-----------------------------------------------<");
 
         List<List<Result>> caseTwoResultsBase = caseTwo(caseOneResultsBase, NUMRUNS, startTime,
                                                         endTime, seeds, false);
 
-        System.out.println(" Case 2 - Base");
         case2 = caseTwoResultsBase;
-        caseTwoResultsBase.forEach(Experiment::printResultList);
-        System.out.println(">-----------------------------------------------<");
-
         List<List<Result>> caseThreeResultsBase = caseTwoResultsBase.stream()
                 .map(r -> caseThree(r, NUMRUNS, startTime, endTime, seeds, false))
                 .collect(toList());
 
-        System.out.println(" Case 3 - Base");
         case3 = caseThreeResultsBase;
-        caseThreeResultsBase.forEach(Experiment::printResultList);
-        System.out.println(">-----------------------------------------------<");
         /*
         Save all three cases and build a DisplayResult object to work with.
          */
@@ -78,33 +67,33 @@ class Experiment
          * IMPROVED EXPERIMENTS
          * SEARCHING FOR A 90% SATISFACTION RATE
          */
-        System.out.println(" Case 1 - Improved");
         improvedcase1 = caseOneResultsImproved;
-        caseOneResultsImproved.forEach(Experiment::printResultList);
-        System.out.println(">-----------------------------------------------<");
 
         List<List<Result>> caseTwoResultsImproved = caseTwo(caseOneResultsImproved, NUMRUNS, startTime,
                                                             endTime, seeds, true);
 
-        System.out.println(" Case 2 - Improved");
         improvedcase2 = caseTwoResultsImproved;
-        caseTwoResultsImproved.forEach(Experiment::printResultList);
-        System.out.println(">-----------------------------------------------<");
-
         List<List<Result>> caseThreeResultsImproved = caseTwoResultsImproved.stream()
                 .map(r -> caseThree(r, NUMRUNS, startTime, endTime, seeds, true))
                 .collect(toList());
 
 
-        System.out.println(" Case 3 - Improved");
         improvedcase3 = caseThreeResultsImproved;
-        caseThreeResultsImproved.forEach(Experiment::printResultList);
-        System.out.println(">-----------------------------------------------<");
 
-        DisplayResult improvedCases = new DisplayResult(case1, case2, case3, improvedcase1, improvedcase2, improvedcase3, NUMRUNS, confidence);
-        System.out.println(improvedCases.ShowTable(improvedCases.getCase1()));
+        DisplayResult improvedCases = new DisplayResult(case1,
+                                                        case2,
+                                                        case3,
+                                                        improvedcase1,
+                                                        improvedcase2,
+                                                        improvedcase3,
+                                                        NUMRUNS,
+                                                        confidence);
+        System.out.println("Printing Improved case 2");
         System.out.println(improvedCases.ShowTable(improvedCases.getCase2()));
-        System.out.println(improvedCases.ShowDifferenceTable(improvedCases.getCase1(),improvedCases.getCase2()));
+        System.out.println("Printing Improved case 3");
+        System.out.println(improvedCases.ShowTable(improvedCases.getCase3()));
+        System.out.println("Printing Diff case 2 - case 3");
+        System.out.println(improvedCases.ShowDifferenceTable(improvedCases.getCase2(),improvedCases.getCase3()));
 
     }
 
