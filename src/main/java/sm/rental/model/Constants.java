@@ -2,6 +2,12 @@ package sm.rental.model;
 
 public class Constants
 {
+
+    public static final int TERMINAL1 = 0;
+    public static final int TERMINAL2 = 1;
+    public static final int RENTAL_COUNTER = 2;
+    public static final int DROP_OFF = 3;
+
     public static final int VAN_SPEED = 20; //The speed that a van transports in the system.
 
     public static final double BOARDING_TIME = 0.2; //the average time that a customer get on the van
@@ -18,5 +24,5 @@ public class Constants
     public static final int ACCEPTABLE_R_TURNARROUNDT = 18; //The acceptable turnaround time for returning customers
 
     public static final Double TARGET_SATISFACTION_RATE_BASE = 0.85;
-    public static final Double TARGET_SATISFACTION_RATE_IMPROVED = 0.90;
+    public static final Double TARGET_SATISFACTION_RATE_IMPROVED = 0.93;
 }

@@ -39,22 +39,12 @@ public class SMRental extends AOSimulationModel
 	/* Group and Queue entities */
 	// Define the reference variables to the various 
 	// entities with scope Set and Unary
-	@Getter private ArrayList<Van> vans;
+	@Getter private Van [] rqVans;
 	@Getter private RentalCounter rentalCounter;
 
-	@Getter private ArrayList<LinkedList<Customer>> terminals;
+	@Getter private LinkedList<Customer>[] vanWaitLine;
 
-    public LinkedList<Customer> getReturnLine() {
-        return returnLine;
-    }
-
-    private LinkedList<Customer> returnLine;
-
-    public LinkedList<Customer> getRentalLine() {
-        return rentalLine;
-    }
-
-    private LinkedList<Customer> rentalLine;
+    @Getter private LinkedList<Customer> rentalLine;
 
 	// Objects can be created here or in the Initialise Action
     private List<Function<SMRental,Optional<ConditionalActivity>>> preconditions;
@@ -93,14 +83,10 @@ public class SMRental extends AOSimulationModel
 
 		// Create Structural Entities Corresponding to Resources
 
-        terminals = new ArrayList<>();
-        terminals.add(new LinkedList<>());
-        terminals.add(new LinkedList<>());
-
-        returnLine = new LinkedList<>();
-        rentalLine = new LinkedList<>();
+        vanWaitLine = new LinkedList [4]; // because good practices went out the window awhile ago
+        rentalLine = new LinkedList<Customer>();
         rentalCounter = new RentalCounter(numRentalAgents);
-        vans = new ArrayList<>();
+        rqVans = new Van[numVans];
 
         // Setup preconditions
         preconditions = new LinkedList<>();
@@ -166,12 +152,12 @@ public class SMRental extends AOSimulationModel
         // Debugging
         System.out.println(">-----------------------------------------------<");
 
-        System.out.println("Clock:" + getClock() + "Q.Terminal1.n:" + terminals.get(0).size()+
-                                   " Q.Terminal2.n:" + terminals.get(1).size() +" Q.RentalLine.n: "+ rentalLine.size()+
-                "Q.ReturnLine.n:" + returnLine.size() +"RG.Vans:" );
+        System.out.println("Clock:" + getClock() + "Q.VanWaitLineTerminal1.n:" + vanWaitLine[0].size()+
+                                   " Q.Terminal2.n:" + vanWaitLine[1].size() +" Q.RentalLine.n: "+ rentalLine.size()+
+                "Q.ReturnLine.n:" + vanWaitLine[2].size()  +"RG.Vans:" );
 
         StringBuilder vanstringsBuilder = new StringBuilder("[");
-        vans.forEach(v -> vanstringsBuilder.append(v.toString()).append("\n"));
+        Arrays.asList(rqVans).forEach(v -> vanstringsBuilder.append(v.toString()).append("\n"));
         String vanstrings = vanstringsBuilder.append("]").toString();
         System.out.println(vanstrings);
         System.out.println(ssovs.toString() +"\n" +dsovs.toString());

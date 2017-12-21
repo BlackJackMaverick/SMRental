@@ -3,9 +3,8 @@ package sm.rental.model.activities;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import simulationModelling.ConditionalActivity;
-import simulationModelling.ScheduledActivity;
+import sm.rental.model.Constants;
 import sm.rental.model.SMRental;
-import sm.rental.model.actions.ReturningArrival;
 import sm.rental.model.entities.Customer;
 import sm.rental.model.entities.Customer.CustomerType;
 import sm.rental.model.entities.RentalCounter;
@@ -19,7 +18,7 @@ import java.util.function.Function;
 public class Service extends ConditionalActivity {
     @NonNull private final SMRental model;
 
-    private Customer customer;
+    private Customer icgcustomer;
 
     public static boolean precondition(SMRental model) {
         return (model.getRentalLine().size() > 0)
@@ -27,21 +26,21 @@ public class Service extends ConditionalActivity {
     }
     public void startingEvent() {
         occupyAgent();
-        customer = model.getRentalLine().pop(); // Remove customer
-        if(customer == null)
+        icgcustomer = model.getRentalLine().pop(); // Remove icgcustomer
+        if(icgcustomer == null)
             throw new RuntimeException("Couldn't service");
     }
 
     public double duration() {
-        return RVPs.uServiceTime(customer.getUType());
+        return RVPs.uServiceTime(icgcustomer.getType());
     }
 
     public void terminatingEvent() {
         freeAgent();
-        if(customer.getUType() == CustomerType.NEW)
-            UDPs.HandleCustomerExit(customer);
+        if(icgcustomer.getType() == CustomerType.NEW)
+            UDPs.HandleCustomerExit(icgcustomer);
         else
-            model.getReturnLine().offerLast(customer);
+            model.getVanWaitLine()[Constants.RENTAL_COUNTER].offerLast(icgcustomer);
     }
 
     //Local User Defined Procedures
