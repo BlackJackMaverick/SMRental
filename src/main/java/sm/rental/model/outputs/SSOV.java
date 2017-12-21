@@ -22,4 +22,11 @@ public class SSOV {
 		numServed++;
 		customerSatisfactionRate = new Double(numSatisfied / (double)numServed);
 	}
+	/*
+	Calculates the percentage of satisfied customers for one run. Divides number of satisfied customers served
+	by the total number of customers served
+	 */
+	public void calcPercentageOfSatisfiedCust(){
+		customerSatisfactionRate = (double)(numSatisfied/numServed);
+	}
 }
