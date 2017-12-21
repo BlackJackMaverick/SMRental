@@ -268,9 +268,10 @@ public class DisplayResult {
     private double getConfidenceInterval(StatisticsUtils stat) {
         double sd = stat.getStdDev();
         double rootn = Math.sqrt(NUMRUNS);
-        double confidenceFactor = Probability.studentT(NUMRUNS - 1, confidence * 0.01);
-
-        return confidenceFactor * sd / rootn;
+        double a = 1-(1-(confidence*0.01));
+        double confidenceFactor = Probability.studentT(NUMRUNS - 1, a);
+//t value for 95% confidence interval is ~1.96.
+        return 1.96 * (sd / rootn);
     }
 }
 

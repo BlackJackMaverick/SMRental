@@ -30,7 +30,7 @@ public class Experiment {
 
     public static void main(String[] args)
     {
-        int NUMRUNS = 4;
+        int NUMRUNS = 100;
         double confidence = 95;
         double startTime = 0.0, endTime = 270.0;
 
@@ -88,12 +88,24 @@ public class Experiment {
                                                         improvedcase3,
                                                         NUMRUNS,
                                                         confidence);
-        System.out.println("Printing Improved case 2");
+        System.out.println("Printing Base case 1\n");
+        System.out.println(improvedCases.ShowTable(improvedCases.getCase1()));
+        System.out.println("Printing Base case 2\n");
         System.out.println(improvedCases.ShowTable(improvedCases.getCase2()));
-        System.out.println("Printing Improved case 3");
+        System.out.println("Printing Base case 3\n");
         System.out.println(improvedCases.ShowTable(improvedCases.getCase3()));
+        System.out.println("Printing improved case 1\n");
+        System.out.println(improvedCases.ShowTable(improvedCases.getImprovedCase1()));
+        System.out.println("Printing improved case 2\n");
+        System.out.println(improvedCases.ShowTable(improvedCases.getImprovedCase2()));
+        System.out.println("Printing improved case 3\n");
+        System.out.println(improvedCases.ShowTable(improvedCases.getImprovedCase3()));
         System.out.println("Printing Diff case 2 - case 3");
         System.out.println(improvedCases.ShowDifferenceTable(improvedCases.getCase2(),improvedCases.getCase3()));
+        System.out.println("Printing Diff Improved case 2 - Improved case 3");
+        System.out.println(improvedCases.ShowDifferenceTable(improvedCases.getImprovedCase2(),improvedCases.getImprovedCase3()));
+        System.out.println("Printing Diff Improved case 3 - Improved case 3");
+        System.out.println(improvedCases.ShowDifferenceTable(improvedCases.getCase3(),improvedCases.getImprovedCase3()));
 
     }
 
