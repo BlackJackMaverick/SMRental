@@ -1,6 +1,7 @@
 package  sm.rental.model.entities;
 
 import lombok.*;
+import sm.rental.model.Constants;
 
 import java.util.LinkedList;
 import java.util.Optional;
@@ -15,16 +16,11 @@ public class Van {
         UNLOADING,
     }
 
-    public enum VanLocation{
-        TERMINAL1,
-        TERMINAL2,
-        DROP_OFF,
-        RENTAL_COUNTER
-    }
+
 
     @Getter private int vanId;
     @Getter @Setter private VanStatus status;
-    @Getter @Setter private VanLocation location;
+    @Getter @Setter private int location;
     private LinkedList<Customer> group;
     @Getter private int capacity; //Maximum number of seats in the van.
     @Getter private double mileage; //Total number of miles driven by the van in the observation interval
@@ -33,7 +29,7 @@ public class Van {
     public Van(int capacity, int id){
         vanId=id;
         status = VanStatus.LOADING;
-        location = VanLocation.TERMINAL1;
+        location = Constants.TERMINAL1;
         this.capacity = this.seatsAvailable = capacity;
         group = new LinkedList<>();
     }

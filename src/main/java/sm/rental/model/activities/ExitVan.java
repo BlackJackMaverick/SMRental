@@ -12,57 +12,60 @@ import sm.rental.model.entities.Van.VanStatus;
 import sm.rental.model.procedures.RVPs;
 import sm.rental.model.procedures.UDPs;
 
+import java.util.Arrays;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.function.Function;
 
 @RequiredArgsConstructor
 public class ExitVan extends ConditionalActivity {
     @NonNull
     private final SMRental model;
-    private Van van = null;
-    private Customer customer = null;
+    private Integer vanid = null;
+    private Customer icgcustomer = null;
 
     public static boolean precondition(SMRental model) {
         return getVanForUnloading(model).isPresent();
     }
 
     public void startingEvent() {
-        Optional<Van> possibleVan = getVanForUnloading(model);
-        if (! possibleVan.isPresent())
-            throw new RuntimeException("Event Started but precondition must've been false: No van present");
-        van = possibleVan.get();
-        Optional<Customer> possibleCustomer = van.removeNextCustomer();
+        OptionalInt possibleVanid = getVanForUnloading(model);
+        if (! possibleVanid.isPresent())
+            throw new RuntimeException("Event Started but precondition must've been false: No vanid present");
+        vanid = possibleVanid.getAsInt();
+        Optional<Customer> possibleCustomer = model.getRqVans()[vanid].removeNextCustomer();
         if (! possibleCustomer.isPresent())
-            throw new RuntimeException("Event Started but precondition must've been false: No customer present in van");
-        customer = possibleCustomer.get();
-        UDPs.UpdateVanStatus(van, VanStatus.EXITING);
+            throw new RuntimeException("Event Started but precondition must've been false: No icgcustomer present in vanid");
+        icgcustomer = possibleCustomer.get();
+        model.getRqVans()[vanid].setStatus(VanStatus.EXITING);
     }
 
     public double duration() {
-        return RVPs.uExitingTime(customer.getNumPassengers());
+        return RVPs.uExitingTime(icgcustomer.getNumPassengers());
     }
 
     public void terminatingEvent() {
-        if (van.getSeatsAvailable() == van.getCapacity())
-            UDPs.UpdateVanStatus(van, VanStatus.LOADING);
+        if (model.getRqVans()[vanid].getSeatsAvailable() == model.getNumSeats())
+            model.getRqVans()[vanid].setStatus(VanStatus.LOADING);
         else
-            UDPs.UpdateVanStatus(van, VanStatus.UNLOADING);
-        if (customer.getUType() == CustomerType.NEW)
-            model.getRentalLine().offerLast(customer);
+            model.getRqVans()[vanid].setStatus(VanStatus.UNLOADING);
+        if (icgcustomer.getType() == CustomerType.NEW)
+            model.getRentalLine().offerLast(icgcustomer);
         else
-            UDPs.HandleCustomerExit(customer);
+            UDPs.HandleCustomerExit(icgcustomer);
     }
 
     // Local User Defined Procedures
 
     /**
-     * The van is located at rental counter or drop off point (Van.Location=RENTAL_COUNTER or DROP_OFF)
+     * The vanid is located at rental counter or drop off point (Van.Location=RENTAL_COUNTER or DROP_OFF)
      * The vans status is unloading
-     * The van is not empty
+     * The vanid is not empty
      **/
-    private static Optional<Van> getVanForUnloading(SMRental model) {
-        return model.getVans().stream()
+    private static OptionalInt getVanForUnloading(SMRental model) {
+        return Arrays.stream(model.getRqVans())
                 .filter(van -> van.getStatus() == VanStatus.UNLOADING && van.getN() > 0)
+                .mapToInt(Van::getVanId)
                 .findFirst();
     }
 

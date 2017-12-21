@@ -5,9 +5,11 @@ import lombok.RequiredArgsConstructor;
 import simulationModelling.ScheduledAction;
 import sm.rental.model.Constants;
 import sm.rental.model.SMRental;
+import sm.rental.model.entities.Customer;
 import sm.rental.model.entities.Van;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 @RequiredArgsConstructor
 public class Initialise extends ScheduledAction {
@@ -20,9 +22,13 @@ public class Initialise extends ScheduledAction {
 	}
 
 	public void actionEvent() {
-		Van [] vans = model.getRqVans();
-		int numVans = model.getNumVans();
-		int vanCapacity = model.getNumSeats();
-		for(int i=0; i<numVans; i++) vans[i] = new Van(vanCapacity, i);
-	}
+        Van[] vans = model.getRqVans();
+        int numVans = model.getNumVans();
+        int vanCapacity = model.getNumSeats();
+        for (int i = 0; i < numVans; i++)
+            vans[i] = new Van(vanCapacity, i);
+        LinkedList[] lines = model.getVanWaitLine();
+        for(int i =0; i < lines.length; i++)
+            lines[i] = new LinkedList<Customer>();
+    }
 }

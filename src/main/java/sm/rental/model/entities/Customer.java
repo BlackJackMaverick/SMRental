@@ -12,6 +12,6 @@ public class Customer {
     }
 
     private double startTime; //The time at which a customer enters the system.
-    private CustomerType uType;
+    private CustomerType type;
     private int numPassengers; //The number of passengers accompanying the customer plus the customer themselves.
 }

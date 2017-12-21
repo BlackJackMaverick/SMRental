@@ -2,11 +2,13 @@ package sm.rental.model;
 
 public class Constants
 {
-    public static final int VAN_SPEED = 20; //The speed that a van transports in the system.
 
-    public static final int T1 = 0; //The speed that a van transports in the system.
-    public static final int T2 = 1; //The speed that a van transports in the system.
-    public static final int PICKUP = 2; //The speed that a van transports in the system.
+    public static final int TERMINAL1 = 0;
+    public static final int TERMINAL2 = 1;
+    public static final int RENTAL_COUNTER = 2;
+    public static final int DROP_OFF = 3;
+
+    public static final int VAN_SPEED = 20; //The speed that a van transports in the system.
 
     public static final double BOARDING_TIME = 0.2; //the average time that a customer get on the van
     public static final double EXTiING_TINE = 0.1; //the average time that a customer get off the van

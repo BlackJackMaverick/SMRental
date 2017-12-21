@@ -42,7 +42,7 @@ public class SMRental extends AOSimulationModel
 	@Getter private Van [] rqVans;
 	@Getter private RentalCounter rentalCounter;
 
-	@Getter private LinkedList[] vanWaitLine;
+	@Getter private LinkedList<Customer>[] vanWaitLine;
 
     @Getter private LinkedList<Customer> rentalLine;
 
@@ -83,7 +83,7 @@ public class SMRental extends AOSimulationModel
 
 		// Create Structural Entities Corresponding to Resources
 
-        vanWaitLine = new LinkedList [3];
+        vanWaitLine = new LinkedList [4]; // because good practices went out the window awhile ago
         rentalLine = new LinkedList<Customer>();
         rentalCounter = new RentalCounter(numRentalAgents);
         rqVans = new Van[numVans];
@@ -152,7 +152,7 @@ public class SMRental extends AOSimulationModel
         // Debugging
         System.out.println(">-----------------------------------------------<");
 
-        System.out.println("Clock:" + getClock() + "Q.Terminal1.n:" + vanWaitLine[0].size()+
+        System.out.println("Clock:" + getClock() + "Q.VanWaitLineTerminal1.n:" + vanWaitLine[0].size()+
                                    " Q.Terminal2.n:" + vanWaitLine[1].size() +" Q.RentalLine.n: "+ rentalLine.size()+
                 "Q.ReturnLine.n:" + vanWaitLine[2].size()  +"RG.Vans:" );
 
